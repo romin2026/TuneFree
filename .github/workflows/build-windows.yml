@@ -6,28 +6,18 @@ on:
 jobs:
   build-win:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "pnpm"
+          cache: "npm"
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
+      - run: npm ci
+      - run: npm run build:win
 
-      - name: Install deps
-        run: pnpm install --frozen-lockfile
-
-      - name: Build installer
-        run: pnpm run build:win
-
-      - name: Upload dist as artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: tunefree-windows-dist
           path: dist/**
