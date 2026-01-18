@@ -211,7 +211,6 @@ import { getAlbumDetail, likeAlbum } from "@/api/album";
 import { formatNumber, fuzzySearch } from "@/utils/helper";
 import { getTimestampTime } from "@/utils/timeTools";
 import { playAllSongs } from "@/utils/Player";
-import { isLogin } from "@/utils/auth";
 import debounce from "@/utils/debounce";
 import formatData from "@/utils/formatData";
 import SvgIcon from "@/components/Global/SvgIcon";
@@ -293,7 +292,6 @@ const isLikeOrDislike = (id) => {
 // 收藏 / 取消收藏歌单
 const likeOrDislike = debounce(async (id) => {
   try {
-    if (!isLogin()) return $message.warning("请登录后使用");
     const type = isLikeOrDislike(id) ? 1 : 2;
     const result = await likeAlbum(type, id);
     if (result.code === 200) {

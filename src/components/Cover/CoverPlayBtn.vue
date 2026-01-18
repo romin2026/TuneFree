@@ -116,7 +116,7 @@ const playAllSongs = async () => {
         }
         if (playListData.value === 400) {
           playLoading.value = false;
-          return $message.error("请登录后使用");
+          return $message.error("获取播放列表时出现错误");
         }
         console.log("不在歌单内");
         // 更改模式和歌单

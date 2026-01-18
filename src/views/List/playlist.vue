@@ -459,7 +459,6 @@ const isLikeOrDislike = (id) => {
 // 收藏 / 取消收藏歌单
 const likeOrDislike = debounce(async (id) => {
   try {
-    if (!isLogin()) return $message.warning("请登录后使用");
     const type = isLikeOrDislike(id) ? 1 : 2;
     const result = await likePlaylist(type, id);
     if (result.code === 200) {
