@@ -15,6 +15,7 @@ coverage
 *.local
 out
 .npmrc
+release/*.zip
 
 
 /cypress/videos/
