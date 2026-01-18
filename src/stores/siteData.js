@@ -246,8 +246,7 @@ const changeLikeListsData = throttle(
   async (id, like, isPath, $this) => {
     try {
       if (!isLogin()) {
-        $message.warning("请登录后使用");
-        if (typeof $changeLogin !== "undefined") $changeLogin();
+        $message.warning("当前版本未提供账号登录功能，无法同步喜欢数据");
         return false;
       }
       if (isPath) return $message.warning("本地歌曲暂不支持该操作");

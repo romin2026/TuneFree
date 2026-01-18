@@ -52,10 +52,10 @@ export const getSongDetail = (ids) => {
 export const getSongUrl = (id, br = "hires") => {
   return axios({
     method: "GET",
-    url: "https://auth.sayqz.com/?path=song/url",
+    url: "/song/url/v1",
     params: {
       id,
-      level: convertLevel(br)
+      level: convertLevel(br),
     },
   });
 };
@@ -83,10 +83,10 @@ export const getSongDownload = async (id, br = "hires") => {
   try {
     const res = await axios({
       method: "GET",
-      url: "https://auth.sayqz.com/?path=song/url",
+      url: "/song/url/v1",
       params: {
         id,
-        level: convertLevel(br)
+        level: convertLevel(br),
       },
     });
     

@@ -1,7 +1,6 @@
 <!-- 导航栏 - 用户数据 -->
 <template>
   <n-dropdown
-    :key="userLoginStatus"
     :show-arrow="true"
     :show="userMenuShow"
     :options="userMenuOptions"
@@ -15,111 +14,47 @@
       @click="userMenuShow = !userMenuShow"
     >
       <div class="avatar">
-        <n-avatar v-if="userLoginStatus" :src="userData.detail?.profile?.avatarUrl" round />
-        <n-avatar v-else round>
+        <n-avatar round>
           <n-icon depth="3">
             <SvgIcon icon="account-circle" />
           </n-icon>
         </n-avatar>
       </div>
       <div class="user-data">
-        <n-text :key="userLoginStatus" class="name">
-          {{ userLoginStatus ? userData.detail?.profile?.nickname || "未知用户名" : "未登录" }}
-        </n-text>
-        <!-- VIP -->
-        <img
-          v-if="userLoginStatus && userData.detail?.profile?.vipType === 11"
-          class="vip"
-          src="/images/pic/vip.png?assest"
-        />
+        <n-text class="name">访客模式</n-text>
         <n-icon depth="3" class="more">
           <SvgIcon icon="menu-down" />
         </n-icon>
       </div>
     </div>
   </n-dropdown>
-  <!-- 登录弹窗 -->
-  <Login ref="loginRef" />
 </template>
 
 <script setup>
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
-import { NIcon, NText, NNumberAnimation, NButton } from "naive-ui";
-import { siteData, siteSettings } from "@/stores";
+import { NIcon, NText } from "naive-ui";
+import { siteSettings } from "@/stores";
 import SvgIcon from "@/components/Global/SvgIcon";
-import userSignIn from "@/utils/userSignIn";
 
-const data = siteData();
 const router = useRouter();
 const settings = siteSettings();
-const { userLoginStatus, userData, userLikeData } = storeToRefs(data);
 const { themeType } = storeToRefs(settings);
 
 // 菜单数据
 const userMenuShow = ref(false);
-
-// 登录弹窗
-const loginRef = ref(null);
 
 // 图标渲染
 const renderIcon = (icon) => {
   return () => h(NIcon, null, () => h(SvgIcon, { icon }));
 };
 
-// 数量统计模块
-const createUserNumber = (num, text, duration = 1000) => {
-  return h(
-    "div",
-    {
-      className: "user-pl",
-      onclick: () => {
-        userMenuShow.value = false;
-        router.push(
-          `/like/${text === "歌单" ? "playlists?" : text === "专辑" ? "albums" : "artists"}`,
-        );
-      },
-    },
-    [
-      h(NNumberAnimation, { from: 0, to: num, duration }),
-      h(NText, { depth: 3, style: { fontSize: "12px" } }, () => [text]),
-    ],
-  );
-};
-
 // 生成导航栏用户信息
 const createUserData = () => {
-  // 是否签到
-  const signInStatus = sessionStorage.getItem("lastSignInDate") ? true : false;
   return h(
     "div",
     { className: "nav-user-data" },
-    userLoginStatus.value
-      ? [
-          // 喜欢数量
-          h("div", { className: "nav-user-num" }, [
-            createUserNumber(userLikeData.value.playlists?.length || 0, "歌单"),
-            createUserNumber(userLikeData.value.albums?.length || 0, "专辑"),
-            createUserNumber(userLikeData.value.artists?.length || 0, "歌手"),
-          ]),
-          // 签到等级
-          h("div", { className: "nav-user-silder" }, [
-            h(
-              NButton,
-              {
-                round: true,
-                renderIcon: renderIcon(signInStatus ? "calendar-check" : "calendar-badge"),
-                disabled: signInStatus,
-                onclick: async () => {
-                  userMenuShow.value = false;
-                  await userSignIn();
-                },
-              },
-              () => [signInStatus ? "今日已签到" : "立即签到"],
-            ),
-          ]),
-        ]
-      : h(NText, { depth: 3 }, () => ["登录后可享受完整功能"]),
+    h(NText, { depth: 3 }, () => ["当前为访客模式，未提供账号登录功能"]),
   );
 };
 
@@ -144,11 +79,6 @@ const userMenuOptions = computed(() => [
     key: "setting",
     icon: renderIcon("round-settings"),
   },
-  {
-    label: userLoginStatus.value ? "退出登录" : "登录账号",
-    key: "logoutOrlogin",
-    icon: renderIcon(userLoginStatus.value ? "logout" : "login"),
-  },
 ]);
 
 // 用户信息选中
@@ -159,10 +89,6 @@ const userMenuSelect = (key) => {
     // 明暗切换
     case "darkOrlight":
       settings.setThemeType(themeType.value === "light" ? "dark" : "light");
-      break;
-    // 登录登出
-    case "logoutOrlogin":
-      loginRef.value.openLoginModal();
       break;
     // 全局设置
     case "setting":

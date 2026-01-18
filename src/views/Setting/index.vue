@@ -97,13 +97,6 @@
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            自动签到
-            <n-text class="tip">在每日首次开启软件时自动签到</n-text>
-          </div>
-          <n-switch v-model:value="autoSignIn" :round="false" />
-        </n-card>
-        <n-card class="set-item">
-          <div class="name">
             <div class="dev">
               全局动态取色
               <n-tag :bordered="false" round size="small" type="warning">
@@ -631,7 +624,6 @@ const {
   lyricsFontSize,
   lyricsBlur,
   showSearchHistory,
-  autoSignIn,
   bottomLyricShow,
   downloadPath,
   memorySeek,
@@ -653,47 +645,8 @@ const setTabsRef = ref(null);
 const setScrollRef = ref(null);
 const setTabsValue = ref("setTab1");
 
-//更新
-const isNewVersion = (currentVersion, newVersion) => {
-  const current = currentVersion.split('.').map(Number);
-  const next = newVersion.split('.').map(Number);
-  
-  for (let i = 0; i < 3; i++) {
-    if (next[i] > current[i]) return true;
-    if (next[i] < current[i]) return false;
-  }
-  return false;
-};
-
 const toUpdate = async () => {
-  try {
-    const response = await fetch('https://auth.sayqz.com/?path=app/info&platform=pc');
-    const data = await response.json();
-    
-    if (data.code === 200 && data.data) {
-      const newVersion = data.data.version;
-      const currentVersion = packageJson.version;
-      
-      if (isNewVersion(currentVersion, newVersion)) {
-        $dialog.info({
-          title: "发现新版本",
-          content: data.data.announcement.replace(/\\n/g, '\n'),
-          positiveText: "立即更新",
-          negativeText: "稍后再说",
-          onPositiveClick: () => {
-            window.open(data.data.update_url, '_blank');
-          }
-        });
-      } else {
-        $message.success('当前已是最新版本');
-      }
-    } else {
-      throw new Error(data.message || '检查更新失败');
-    }
-  } catch (error) {
-    console.error('检查更新失败:', error);
-    $message.error('检查更新失败，请稍后重试');
-  }
+  $message.info("当前版本已移除在线更新检查，请关注发布渠道获取更新");
 };
 
 // 基础数据
