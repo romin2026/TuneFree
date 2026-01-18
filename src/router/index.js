@@ -1,6 +1,7 @@
 import { nextTick } from "vue";
 import { createRouter, createWebHashHistory } from "vue-router";
 import { checkPlatform } from "@/utils/helper";
+import { isLogin } from "@/utils/auth";
 import routes from "@/router/routes";
 
 // 基础配置
@@ -25,8 +26,20 @@ router.beforeEach((to, from, next) => {
       $loadingBar.start();
     }
   }
+  // 判断是否需要登录
+  if (to.meta.needLogin) {
+    if (isLogin()) {
+      next();
+    } else {
+      $message.warning("当前为访客模式，无法访问需要登录的页面");
+      if (typeof $loadingBar !== "undefined" && !checkPlatform.electron()) {
+        $loadingBar.error();
+      }
+      next("/403");
+    }
+  }
   // 是否为本地功能
-  if (to.meta.needLocal) {
+  else if (to.meta.needLocal) {
     if (checkPlatform.electron()) {
       next();
     } else {
