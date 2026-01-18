@@ -122,6 +122,14 @@
    | `pnpm build:linux` | Linux    |
    | `pnpm build:mac`   | MacOS    |
 
+## 📦 发布压缩包
+
+使用下面命令生成新的源码压缩包，并同步更新 `release/latest.json` 作为发布清单。
+
+```bash
+pnpm release:archive
+```
+
 ## 📢 免责声明
 
 再次声明，本项目基于开源项目SPlayer进行二次开发，故产生的一切责任都与SPlayer以及他的开发者无关!，仅供个人学习研究使用，禁止用于商业及非法用途。同时，本项目开发者承诺 没有任何破解网易音乐等相关情况，只是使用了我自己会员账号的Cookie进行了请求，请求使用的链接为网易云音乐官方的API
