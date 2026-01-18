@@ -105,7 +105,6 @@ import { useRouter } from "vue-router";
 import { likeComment } from "@/api/comment";
 import { getCommentTime } from "@/utils/timeTools";
 import { formatNumber } from "@/utils/helper";
-import { isLogin } from "@/utils/auth";
 import emojiData from "@/assets/emoji.json";
 import throttle from "@/utils/throttle";
 
@@ -170,23 +169,18 @@ const getCommentText = (text) => {
 const toLikeComment = throttle(
   async (data) => {
     try {
-      if (isLogin()) {
-        const isLike = data?.liked;
-        if (isLike === undefined) return false;
-        // 点赞或取消
-        const result = await likeComment(
-          router.currentRoute.value.query.id,
-          data?.commentId,
-          isLike ? 2 : 1,
-          getCommentType(),
-        );
-        if (result.code === 200) {
-          data.liked = !isLike;
-          data.likedCount += isLike ? -1 : 1;
-        }
-      } else {
-        $message.warning("请登录后使用");
-        if (typeof $changeLogin !== "undefined") $changeLogin();
+      const isLike = data?.liked;
+      if (isLike === undefined) return false;
+      // 点赞或取消
+      const result = await likeComment(
+        router.currentRoute.value.query.id,
+        data?.commentId,
+        isLike ? 2 : 1,
+        getCommentType(),
+      );
+      if (result.code === 200) {
+        data.liked = !isLike;
+        data.likedCount += isLike ? -1 : 1;
       }
     } catch (error) {
       console.error("点赞出错：", error);

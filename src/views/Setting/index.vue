@@ -547,7 +547,7 @@
             <div class="name">TuneFree当前版本：{{ packageJson.version }}</div>
             <div class="donate-link">
               <n-button type="info" @click="toUpdate">
-                检查更新
+                更新信息
               </n-button>
             </div>
           </n-card>
@@ -688,11 +688,11 @@ const toUpdate = async () => {
         $message.success('当前已是最新版本');
       }
     } else {
-      throw new Error(data.message || '检查更新失败');
+      throw new Error(data.message || '更新信息获取失败');
     }
   } catch (error) {
-    console.error('检查更新失败:', error);
-    $message.error('检查更新失败，请稍后重试');
+    console.error('更新信息获取失败:', error);
+    $message.error('更新信息获取失败，请稍后重试');
   }
 };
 

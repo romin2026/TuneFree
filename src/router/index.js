@@ -1,7 +1,6 @@
 import { nextTick } from "vue";
 import { createRouter, createWebHashHistory } from "vue-router";
 import { checkPlatform } from "@/utils/helper";
-import { isLogin } from "@/utils/auth";
 import routes from "@/router/routes";
 
 // 基础配置
@@ -28,15 +27,7 @@ router.beforeEach((to, from, next) => {
   }
   // 判断是否需要登录
   if (to.meta.needLogin) {
-    if (isLogin()) {
-      next();
-    } else {
-      $message.warning("请登录后使用");
-      if (typeof $loadingBar !== "undefined" && !checkPlatform.electron()) {
-        $loadingBar.error();
-      }
-      if (typeof $changeLogin !== "undefined") $changeLogin();
-    }
+    next();
   }
   // 是否为本地功能
   else if (to.meta.needLocal) {

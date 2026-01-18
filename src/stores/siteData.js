@@ -245,11 +245,6 @@ const showError = (error, msg, show = true) => {
 const changeLikeListsData = throttle(
   async (id, like, isPath, $this) => {
     try {
-      if (!isLogin()) {
-        $message.warning("请登录后使用");
-        if (typeof $changeLogin !== "undefined") $changeLogin();
-        return false;
-      }
       if (isPath) return $message.warning("本地歌曲暂不支持该操作");
       const list = $this.userLikeData.songs;
       const exists = list.includes(id);

@@ -362,6 +362,7 @@ import {
   processSpectrum,
 } from "@/utils/Player";
 import { getSongPlayTime } from "@/utils/timeTools";
+import { checkPlatform } from "@/utils/helper";
 import debounce from "@/utils/debounce";
 import SvgIcon from "@/components/Global/SvgIcon";
 import VueSlider from "vue-slider-component";
@@ -561,20 +562,38 @@ watch(
   () => playHeartbeatMode.value,
   (val) => $message.success(`已${val ? "开启" : "退出"}心动模式`),
 );
+const isElectron = checkPlatform.electron();
 // 定义showDesktopLyric
-const showDesktopLyric = ref(false); 
+const showDesktopLyric = ref(
+  isElectron && localStorage.getItem("desktopLyricEnabled") === "true",
+);
+
+const syncDesktopLyric = (enabled) => {
+  if (!isElectron) return;
+  localStorage.setItem("desktopLyricEnabled", String(enabled));
+  if (typeof electron !== "undefined") {
+    electron.ipcRenderer.send(enabled ? "lyric-show" : "lyric-hide");
+  }
+};
 
 // 切换桌面歌词的显示状态
 const toggleDesktopLyric = () => {
-
+  if (!isElectron) {
+    $message.warning("桌面歌词仅客户端支持");
+    return;
+  }
   showDesktopLyric.value = !showDesktopLyric.value;
 
   $message.success(`桌面歌词已${showDesktopLyric.value ? '开启' : '关闭'}`);
 };
 
-watch(showDesktopLyric, (newValue) => {
-  electron.ipcRenderer.send(newValue ? 'lyric-show' : 'lyric-hide')
-})
+watch(
+  showDesktopLyric,
+  (newValue) => {
+    syncDesktopLyric(newValue);
+  },
+  { immediate: true },
+);
 
 // 监听歌词索引变化
 watch(playSongLyricIndex, (newIndex) => {

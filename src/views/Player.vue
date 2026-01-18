@@ -229,7 +229,6 @@ import { fadePlayOrPause } from "@/utils/Player";
 import { siteStatus, siteData } from "@/stores";
 import { useRouter } from "vue-router";
 import { formatNumber } from "@/utils/helper";
-import { isLogin } from "@/utils/auth";
 import formatData from "@/utils/formatData";
 import throttle from "@/utils/throttle";
 import SvgIcon from "@/components/Global/SvgIcon";
@@ -392,7 +391,6 @@ const getSimiVideoData = async (id) => {
 const videoLike = throttle(
   async () => {
     try {
-      if (!isLogin()) return $message.warning("请登录后使用");
       const isLike = videoData.value?.liked;
       if (isLike === undefined || !videoData.value?.id) return false;
       // 点赞或取消
@@ -414,7 +412,6 @@ const videoLike = throttle(
 const videoCollection = throttle(
   async () => {
     try {
-      if (!isLogin()) return $message.warning("请登录后使用");
       const id = videoData.value.id;
       const type = isLikeOrDislike(id) ? 1 : 2;
       const result = isVideo.value ? await likeVideo(type, id) : await likeMv(type, id);

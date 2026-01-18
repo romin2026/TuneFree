@@ -237,7 +237,7 @@ class MainProcess {
       // 创建主窗口
       this.createWindow();
       // 检测更新
-      //configureAutoUpdater(); 检查更新禁用
+      //configureAutoUpdater(); 自动更新已禁用
       // 引入主 Ipc
       mainIpcMain(this.mainWindow, {
         showLyricWin: () => {

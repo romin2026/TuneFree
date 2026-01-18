@@ -1,7 +1,7 @@
 import axios from "@/utils/request";
 
 /**
- * 检查应用更新
+ * 获取应用更新信息
  */
 export const checkUpdate = async () => {
   try {
@@ -24,10 +24,10 @@ export const checkUpdate = async () => {
       message: data.message
     };
   } catch (error) {
-    console.error('检查更新失败:', error);
+    console.error('更新信息获取失败:', error);
     return {
       code: 500,
-      message: '检查更新失败，请重试'
+      message: '更新信息获取失败，请重试'
     };
   }
 }; 
