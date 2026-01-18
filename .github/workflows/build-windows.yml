@@ -12,12 +12,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
 
-      - run: npm ci
-      - run: npm run build:win
+      - name: Install deps
+        run: npm install
 
-      - uses: actions/upload-artifact@v4
+      - name: Build installer
+        run: npm run build:win
+
+      - name: List dist
+        run: dir dist
+
+      - name: Upload dist as artifact
+        uses: actions/upload-artifact@v4
         with:
           name: tunefree-windows-dist
           path: dist/**
