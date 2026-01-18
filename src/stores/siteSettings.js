@@ -9,7 +9,6 @@ const useSiteSettingsStore = defineStore("siteSettings", {
       closeType: "hide", // 关闭方式 close 直接关闭 / hide 最小化到任务栏
       showTaskbarProgress: false, // 显示歌曲任务栏进度
       showSearchHistory: true, // 搜索历史
-      autoSignIn: true, // 自动签到
       showGithub: true,
       showSider: true, // 显示侧边栏
       siderShowCover: false, // 侧边栏显示封面

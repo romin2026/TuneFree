@@ -185,8 +185,7 @@ const toLikeComment = throttle(
           data.likedCount += isLike ? -1 : 1;
         }
       } else {
-        $message.warning("请登录后使用");
-        if (typeof $changeLogin !== "undefined") $changeLogin();
+        $message.warning("当前版本未提供账号登录功能，无法点赞");
       }
     } catch (error) {
       console.error("点赞出错：", error);

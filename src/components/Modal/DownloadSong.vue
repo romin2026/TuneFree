@@ -60,7 +60,6 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { isLogin } from "@/utils/auth";
 import { useRouter } from "vue-router";
 import { siteData, siteSettings } from "@/stores";
 import { getSongDetail, getSongDownload, getSongLyric } from "@/api/song";
@@ -216,24 +215,19 @@ const openDownloadModal = (data) => {
     downloadSongShow.value = true;
     getMusicDetailData(songId.value);
   };
-  if (isLogin()) {
-    // 普通歌曲或为云盘歌曲
-    if (
-      router.currentRoute.value.name === "cloud" ||
-      data?.fee === 0 ||
-      data?.pc ||
-      userData.value.detail?.profile?.vipType !== 0
-    ) {
-      return toDownload();
-    }
-    // 权限不足
-    if (data?.fee !== 0 && userData.value.detail?.profile?.vipType !== 11 && !data?.pc) {
-      return toDownload();
-    }
-    return toDownload();
-  } else {
+  if (
+    router.currentRoute.value.name === "cloud" ||
+    data?.fee === 0 ||
+    data?.pc ||
+    userData.value.detail?.profile?.vipType !== 0
+  ) {
     return toDownload();
   }
+  // 权限不足
+  if (data?.fee !== 0 && userData.value.detail?.profile?.vipType !== 11 && !data?.pc) {
+    return toDownload();
+  }
+  return toDownload();
 };
 
 // 关闭歌曲下载

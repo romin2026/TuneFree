@@ -92,17 +92,15 @@ import { darkTheme, NButton } from "naive-ui";
 import { musicData, siteStatus, siteSettings } from "@/stores";
 import { checkPlatform } from "@/utils/helper";
 import { initPlayer } from "@/utils/Player";
-import userSignIn from "@/utils/userSignIn";
 import globalShortcut from "@/utils/globalShortcut";
 import globalEvents from "@/utils/globalEvents";
-import axios from 'axios';
 import packageJson from "@/../package.json";
 const isLyric = ref(true)
 const router = useRouter();
 const music = musicData();
 const status = siteStatus();
 const settings = siteSettings();
-const { autoPlay, showSider, autoSignIn } = storeToRefs(settings);
+const { autoPlay, showSider } = storeToRefs(settings);
 const { showPlayBar, asideMenuCollapsed, showFullPlayer } = storeToRefs(status);
 
 // 公告数据
@@ -166,46 +164,6 @@ const showAnnouncements = () => {
 };
 
 
-//更新
-const isNewVersion = (currentVersion, newVersion) => {
-  // 简单版本号比较逻辑，实际逻辑可能需要更复杂的比较
-  return newVersion.localeCompare(currentVersion) === 1;
-};
-// 是否有更新
-const showUpdate = () => {
-  axios.get('https://api.tunefree.fun/update/')
-    .then(response => {
-      const newVersion = response.newVersion;
-      const downloadUrl = response.downloadUrl;
-      const currentVersion = packageJson.version; // 这里应用当前的版本号，或者通过其他方式获取
-      if (isNewVersion(currentVersion, newVersion)) {
-        if (checkPlatform.electron()) {
-          $notification.create({
-          title: "TuneFree发布更新啦！🎉",
-          duration: 6000,
-          content: `我们的音乐之旅即将迈入新的乐章！ ${newVersion} 版本带着未曾有过的和声与节拍登场了。立即更新，让我们和新旋律一起自由起舞吧！`,
-          meta: "当前版本 v " + (packageJson.version || "1.0.0"),
-          action: () =>
-            h(
-              NButton,
-              {
-                text: true,
-                type: "primary",
-                onClick: () => {
-                  window.open(downloadUrl, '_blank');
-                },
-              },
-              {
-                default: () => "更新",
-              },
-            ),
-        });
-    }
-      } 
-    })
-};
-
-
 // 网络无法连接
 const canNotConnect = (error) => {
   console.error("网络连接错误：", error.message);
@@ -243,11 +201,8 @@ onMounted(async () => {
   if (!checkPlatform.electron()) {
     window.addEventListener("keyup", handleKeyUp);
   }
-  // 自动签到
-  if (autoSignIn.value) await userSignIn();
   // 显示公告
   showAnnouncements();
-  //showUpdate();
 });
 
 onUnmounted(() => {

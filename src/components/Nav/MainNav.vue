@@ -99,7 +99,7 @@ const siteName = "TuneFree";
 
 // 打开 GitHub
 const openGithub = () => {
-  window.open('https://tunefree.fun');
+  window.open(packageJson.github || packageJson.home);
 };
 
 // 主菜单渲染

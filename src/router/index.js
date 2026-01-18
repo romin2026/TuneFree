@@ -31,11 +31,11 @@ router.beforeEach((to, from, next) => {
     if (isLogin()) {
       next();
     } else {
-      $message.warning("请登录后使用");
+      $message.warning("当前为访客模式，无法访问需要登录的页面");
       if (typeof $loadingBar !== "undefined" && !checkPlatform.electron()) {
         $loadingBar.error();
       }
-      if (typeof $changeLogin !== "undefined") $changeLogin();
+      next("/403");
     }
   }
   // 是否为本地功能

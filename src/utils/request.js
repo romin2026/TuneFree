@@ -1,5 +1,4 @@
 import { checkPlatform } from "@/utils/helper";
-import { getCookie, isLogin } from "@/utils/auth";
 import axios from "axios";
 
 // 全局地址
@@ -16,34 +15,15 @@ axios.defaults.withCredentials = true;
 // 请求拦截
 axios.interceptors.request.use(
   (request) => {
-    // 当请求的接口为特定地址时不附加cookie参数和realIP
-    if (!request.url.startsWith('https://api.tunefree.fun/ncm/song/')) {
-      if (!request.params) request.params = {};
-      // 附加 cookie
-      if (!request.noCookie && (isLogin() || getCookie("MUSIC_U") !== null)) {
-        request.params.cookie = `MUSIC_U=${getCookie("MUSIC_U")}`;
-        // 对于非 auth.sayqz.com 的请求，添加分号
-        if (!request.url.startsWith('https://auth.sayqz.com')) {
-          request.params.cookie += ';';
-        }
-      }
-      // 附加 realIP
-      if (!checkPlatform.electron()) request.params.realIP = "116.25.146.177";
-    } else {
-      // 对特定地址的请求，去除 cookie 和 realIP
-      if (request.params && request.params.cookie) {
-        delete request.params.cookie;
-      }
-      if (request.params && request.params.realIP) {
-        delete request.params.realIP;
-      }
-    }
-    
-    // 去除 cookie
+    if (!request.params) request.params = {};
+    // 附加 realIP
+    if (!checkPlatform.electron()) request.params.realIP = "116.25.146.177";
+
+    // 去除 cookie 标记
     if (request.noCookie) {
       request.params.noCookie = true;
     }
-    
+
     // 发送请求
     return request;
   },
