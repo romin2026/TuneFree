@@ -77,25 +77,22 @@ jobs:
   BuildWindows:
     needs: Build
     if: needs.Build.outputs.windows == 1
-    runs-on: 	windows-latest
+    runs-on: windows-latest
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
-      - name: Install Node.js, NPM and Yarn
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-        - name: setup environment
+      - name: Setup pnpm
         run: npm install -g pnpm
-
-
-
-        - name: install libs
+      - name: Install deps
         run: pnpm install --frozen-lockfile
-      - name: postinstall
-        run: pnpm postinstall
-      - name: build 
-        run: npm run build
+      - name: Postinstall
+        run: pnpm run postinstall --if-present
+      - name: Build
+        run: pnpm run build
       - name: pack x86
         if: needs.Build.outputs.x86 == 1
         run: electron-builder --win --ia32 --config --publish never
