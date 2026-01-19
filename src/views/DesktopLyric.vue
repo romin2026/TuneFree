@@ -24,6 +24,7 @@
 import { onMounted, ref, onBeforeUnmount, watch } from 'vue';
 
 let winPos = null;
+const hasElectron = typeof electron !== "undefined";
 let dragging = false;
 const currentLyric = ref('😘TuneFree By Sayqz🌴');
 const isTransitioning = ref(false);
@@ -46,6 +47,16 @@ const lyricColors = ref([
 const currentColorIndex = ref(parseInt(localStorage.getItem('currentColorIndex'), 10) || 0); 
 
 let lyricInterval = null;
+const handleLyricUpdate = (_, payload) => {
+    const newLyric = payload?.currentLyric || '😘TuneFree By Sayqz🌴';
+    if (newLyric !== currentLyric.value) {
+        isTransitioning.value = true;
+        setTimeout(() => {
+            currentLyric.value = newLyric;
+            isTransitioning.value = false;
+        }, 300);
+    }
+};
 
 const winDown = (ev) => {
     dragging = true;
@@ -121,6 +132,9 @@ onMounted(() => {
     window.addEventListener("mousedown", winDown);
     window.addEventListener("mousemove", winMove);
     window.addEventListener("mouseup", winUp);
+    if (hasElectron) {
+        electron.ipcRenderer.on("lyric-update", handleLyricUpdate);
+    }
 
     updateLyrics();
 });
@@ -129,6 +143,9 @@ onBeforeUnmount(() => {
     window.removeEventListener("mousedown", winDown);
     window.removeEventListener("mousemove", winMove);
     window.removeEventListener("mouseup", winUp);
+    if (hasElectron) {
+        electron.ipcRenderer.off("lyric-update", handleLyricUpdate);
+    }
     if (lyricInterval) {
         clearTimeout(lyricInterval);
         lyricInterval = null;

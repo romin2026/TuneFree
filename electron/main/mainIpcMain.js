@@ -14,7 +14,15 @@ import fs from "fs/promises";
 
 const mainIpcMain = (
   win,
-  { showLyricWin, hideLyricWin, lyricDragStart, lyricDragMoving, lyricLock, lyricUnlock },
+  {
+    showLyricWin,
+    hideLyricWin,
+    lyricDragStart,
+    lyricDragMoving,
+    lyricLock,
+    lyricUnlock,
+    sendLyricUpdate,
+  },
 ) => {
 
   
@@ -30,6 +38,9 @@ const mainIpcMain = (
   ipcMain.on("lyric-hide", () => {
     hideLyricWin()
   })
+  ipcMain.on("lyric-update", (_, payload) => {
+    sendLyricUpdate(payload);
+  });
   ipcMain.on('lyric-drag-start', (ev) => {
     lyricDragStart(ev)
   })
@@ -55,8 +66,8 @@ const mainIpcMain = (
     win.hide();
   });
   ipcMain.on("window-close", () => {
-    win.close();
     app.isQuiting = true;
+    win.close();
     app.quit();
   });
   ipcMain.on("window-relaunch", () => {

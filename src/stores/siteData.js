@@ -246,8 +246,19 @@ const changeLikeListsData = throttle(
   async (id, like, isPath, $this) => {
     try {
       if (!isLogin()) {
-        $message.warning("当前版本未提供账号登录功能，无法同步喜欢数据");
-        return false;
+        if (isPath) return $message.warning("本地歌曲暂不支持该操作");
+        const list = $this.userLikeData.songs;
+        const exists = list.includes(id);
+        if (like && !exists) {
+          list.push(id);
+          $message.success("已加入本地喜欢列表");
+        } else if (!like && exists) {
+          list.splice(list.indexOf(id), 1);
+          $message.success("已从本地喜欢列表移除");
+        } else if (like && exists) {
+          $message.info("我喜欢的音乐中已存在该歌曲");
+        }
+        return true;
       }
       if (isPath) return $message.warning("本地歌曲暂不支持该操作");
       const list = $this.userLikeData.songs;

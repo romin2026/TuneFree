@@ -128,7 +128,7 @@
             </template>
           </n-button>
           <n-button
-            v-if="!isUserPLayList"
+            v-if="!isUserPLayList && !isLocalLikeSongs"
             :focusable="false"
             class="like"
             size="large"
@@ -150,7 +150,7 @@
             {{ isLikeOrDislike(playlistId) ? "收藏歌单" : "取消收藏" }}
           </n-button>
           <n-button
-            v-else
+            v-else-if="isUserPLayList && !isLocalLikeSongs"
             :focusable="false"
             class="like"
             size="large"
@@ -261,10 +261,17 @@ const data = siteData();
 const { userLikeData, userData } = storeToRefs(data);
 
 // 歌单 ID
-const playlistId = ref(
-  router.currentRoute.value.name === "like-songs"
-    ? userLikeData.value.playlists?.[0]?.id || null
-    : router.currentRoute.value.query.id,
+const LOCAL_LIKE_PLAYLIST_ID = "local-like-songs";
+const getCurrentPlaylistId = (route) => {
+  if (route.name === "like-songs") {
+    return isLogin() ? userLikeData.value.playlists?.[0]?.id || null : LOCAL_LIKE_PLAYLIST_ID;
+  }
+  return route.query?.id;
+};
+const playlistId = ref(getCurrentPlaylistId(router.currentRoute.value));
+
+const isLocalLikeSongs = computed(
+  () => router.currentRoute.value.name === "like-songs" && !isLogin(),
 );
 
 // 子组件
@@ -334,6 +341,31 @@ const getPlayListDetailData = async (id, justDetail = false) => {
     // 清空数据
     playListDetail.value = null;
     if (!justDetail) playListData.value = null;
+    if (isLocalLikeSongs.value) {
+      const localCover = "/images/pic/like.jpg?assest";
+      const likeIds = userLikeData.value.songs || [];
+      playListDetail.value = {
+        name: "我喜欢的音乐",
+        cover: localCover,
+        coverSize: { l: localCover, m: localCover, s: localCover },
+        creator: { nickname: "本地收藏" },
+        count: likeIds.length,
+        playCount: 0,
+        createTime: null,
+        updateTime: null,
+        description: "未登录状态下的本地喜欢列表",
+      };
+      isUserPLayList.value = true;
+      moreOptions.value = [];
+      if (justDetail) return true;
+      if (!likeIds.length) {
+        playListData.value = "empty";
+        return true;
+      }
+      const songsDetail = await getSongDetail(likeIds.join(","));
+      playListData.value = formatData(songsDetail.songs, "song");
+      return true;
+    }
     // 获取数据
     const detail = await getPlayListDetail(id);
     // 基础信息
@@ -480,10 +512,7 @@ watch(
   () => router.currentRoute.value,
   async (val) => {
     if (val.name === "playlist" || val.name === "like-songs") {
-      playlistId.value =
-        router.currentRoute.value.name === "like-songs"
-          ? userLikeData.value.playlists?.[0]?.id || null
-          : val.query?.id;
+      playlistId.value = getCurrentPlaylistId(val);
       await getPlayListDetailData(playlistId.value);
     }
   },

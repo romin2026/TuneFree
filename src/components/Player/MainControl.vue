@@ -362,6 +362,7 @@ import {
   processSpectrum,
 } from "@/utils/Player";
 import { getSongPlayTime } from "@/utils/timeTools";
+import { checkPlatform } from "@/utils/helper";
 import debounce from "@/utils/debounce";
 import SvgIcon from "@/components/Global/SvgIcon";
 import VueSlider from "vue-slider-component";
@@ -576,11 +577,15 @@ const toggleDesktopLyric = () => {
 };
 
 // 监听桌面歌词设置变化
-watch(showDesktopLyric, (newValue) => {
-  if (checkPlatform.electron()) {
-    electron.ipcRenderer.send(newValue ? 'lyric-show' : 'lyric-hide');
-  }
-});
+watch(
+  showDesktopLyric,
+  (newValue) => {
+    if (checkPlatform.electron()) {
+      electron.ipcRenderer.send(newValue ? "lyric-show" : "lyric-hide");
+    }
+  },
+  { immediate: true },
+);
 
 // 监听歌词索引变化
 watch(playSongLyricIndex, (newIndex) => {
@@ -610,15 +615,36 @@ watch(playSongLyricIndex, (newIndex) => {
         localStorage.setItem('currentLyric', fullLyric);
         localStorage.setItem('nextLyric', nextLyric);
         localStorage.setItem('newIndex', newIndex);
+        if (checkPlatform.electron()) {
+          electron.ipcRenderer.send("lyric-update", {
+            currentLyric: fullLyric,
+            nextLyric,
+            newIndex,
+          });
+        }
       } else {
         console.log('逐字歌词索引超出范围:', newIndex);
         localStorage.setItem('newIndex', newIndex);
+        if (checkPlatform.electron()) {
+          electron.ipcRenderer.send("lyric-update", {
+            currentLyric: "",
+            nextLyric: "",
+            newIndex,
+          });
+        }
       }
     } else {
       // 缓存普通歌词到 localStorage
       localStorage.setItem('currentLyric', currentLyric);
       localStorage.setItem('nextLyric', nextLyric);
       localStorage.setItem('newIndex', newIndex);
+      if (checkPlatform.electron()) {
+        electron.ipcRenderer.send("lyric-update", {
+          currentLyric,
+          nextLyric,
+          newIndex,
+        });
+      }
     }
 
     // console.log('currentLyric:', localStorage.getItem('currentLyric'));
@@ -626,6 +652,13 @@ watch(playSongLyricIndex, (newIndex) => {
   } else {
     console.log('普通歌词索引超出范围:', newIndex);
     localStorage.setItem('newIndex', newIndex);
+    if (checkPlatform.electron()) {
+      electron.ipcRenderer.send("lyric-update", {
+        currentLyric: "",
+        nextLyric: "",
+        newIndex,
+      });
+    }
   }
 });
 
