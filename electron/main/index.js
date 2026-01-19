@@ -231,6 +231,11 @@ class MainProcess {
     if(!this.lyricWindow) return
     this.lyricWindow.setIgnoreMouseEvents(false)
   }
+
+  sendLyricUpdate(payload) {
+    if (!this.lyricWindow || this.lyricWindow.isDestroyed()) return;
+    this.lyricWindow.webContents.send("lyric-update", payload);
+  }
   // 主应用程序事件
   mainAppEvents() {
     app.whenReady().then(async () => {
@@ -257,7 +262,10 @@ class MainProcess {
         },
         lyricUnlock:(ev) => {
           this.lyricUnlock()
-        }
+        },
+        sendLyricUpdate: (payload) => {
+          this.sendLyricUpdate(payload);
+        },
       });
       // 系统托盘
       createSystemTray(this.mainWindow);
