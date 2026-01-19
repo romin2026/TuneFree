@@ -155,7 +155,6 @@ const routes = [
     name: "like-songs",
     meta: {
       title: "歌单",
-      needLogin: true,
     },
     component: () => import("@/views/List/playlist.vue"),
   },
@@ -215,7 +214,6 @@ const routes = [
     name: "like",
     meta: {
       title: "我的收藏",
-      needLogin: true,
     },
     component: () => import("@/views/Like/index.vue"),
     redirect: "/like/albums",

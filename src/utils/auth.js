@@ -6,7 +6,10 @@ import { siteData } from "@/stores";
  */
 export const isLogin = () => {
   const data = siteData();
-  // 更改状态
-  data.userLoginStatus = false;
-  return false;
+  // 由于移除了登录系统，改为本地数据模式
+  // 检查本地存储的用户数据或 IndexedDB 中是否存在用户信息
+  const userInfo = localStorage.getItem('userInfo');
+  const hasUserData = userInfo !== null && userInfo !== '' && userInfo !== 'undefined';
+  data.userLoginStatus = hasUserData;
+  return hasUserData;
 };

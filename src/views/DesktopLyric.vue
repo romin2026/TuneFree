@@ -108,6 +108,8 @@ const updateLyrics = () => {
         console.error('更新歌词出错:', error);
         currentLyric.value = '😘TuneFree By Sayqz🌴';
     }
+    // 使用 setTimeout 替代递归 setInterval，防止栈溢出
+    lyricInterval = setTimeout(updateLyrics, 200);
 }
 
 const toggleLyricColor = () => {
@@ -120,7 +122,6 @@ onMounted(() => {
     window.addEventListener("mousemove", winMove);
     window.addEventListener("mouseup", winUp);
 
-    lyricInterval = setInterval(updateLyrics, 200);
     updateLyrics();
 });
 
@@ -129,7 +130,7 @@ onBeforeUnmount(() => {
     window.removeEventListener("mousemove", winMove);
     window.removeEventListener("mouseup", winUp);
     if (lyricInterval) {
-        clearInterval(lyricInterval);
+        clearTimeout(lyricInterval);
         lyricInterval = null;
     }
 });

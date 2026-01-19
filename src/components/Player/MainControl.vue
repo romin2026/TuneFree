@@ -568,8 +568,6 @@ watch(
   () => playHeartbeatMode.value,
   (val) => $message.success(`已${val ? "开启" : "退出"}心动模式`),
 );
-// 定义showDesktopLyric
-const showDesktopLyric = ref(false); 
 
 // 切换桌面歌词的显示状态
 const toggleDesktopLyric = () => {

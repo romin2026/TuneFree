@@ -98,55 +98,47 @@
         <n-card class="set-item">
           <div class="name">
             <div class="dev">
-              全局动态取色
-              <n-tag :bordered="false" round size="small" type="warning">
-                开发中
-                <template #icon>
-                  <n-icon>
-                    <SvgIcon icon="code" />
-                  </n-icon>
-                </template>
-              </n-tag>
+              显示开发者选项 <n-tag>Beta</n-tag>
             </div>
-            <n-text class="tip">主题色是否跟随封面，目前感觉不好看</n-text>
+            <n-text class="tip">显示更多开发者相关功能和选项</n-text>
+          </div>
+          <n-switch v-model:value="showGithub" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="name">
+            主题色渐变跟随封面
+            <n-text class="tip">程序启动时自动检测</n-text>
           </div>
           <n-switch
             v-model:value="themeAutoCover"
             :round="false"
-            :disabled="Object.keys(coverTheme)?.length === 0"
             @update:value="themeAutoCoverChange"
           />
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            <div class="dev">
-              全局动态取色类别
-              <n-tag :bordered="false" round size="small" type="warning">
-                开发中
-                <template #icon>
-                  <n-icon>
-                    <SvgIcon icon="code" />
-                  </n-icon>
-                </template>
-              </n-tag>
-            </div>
-            <n-text class="tip">将在下一首播放或刷新时生效，不建议更改</n-text>
+            主题色渐变样式
+            <n-text class="tip">
+              {{
+                themeAutoCoverType === "linear"
+                  ? "线性渐变样式"
+                  : themeAutoCoverType === "radial"
+                    ? "径向渐变样式"
+                    : "锥形渐变样式"
+              }}
+            </n-text>
           </div>
           <n-select
             v-model:value="themeAutoCoverType"
             :disabled="!themeAutoCover"
             :options="[
               {
-                label: '中性',
-                value: 'neutral',
+                label: '线性',
+                value: 'linear',
               },
               {
-                label: '中性变体',
-                value: 'neutralVariant',
-              },
-              {
-                label: '主要',
-                value: 'primary',
+                label: '径向',
+                value: 'radial',
               },
               {
                 label: '次要',
@@ -200,6 +192,10 @@
             <n-text class="tip">在播放时显示浮窗歌词，方便随时了解歌词内容</n-text>
           </div>
           <n-switch v-model:value="showDesktopLyric" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="name">关闭软件</div>
+          <n-button type="error" @click="() => electron.ipcRenderer.send('window-close')">退出应用</n-button>
         </n-card>
       </div>
       <div v-else class="set-type">
@@ -304,120 +300,40 @@
             v-model:value="playerBackgroundType"
             :options="[
               {
-                label: '流体效果',
-                value: 'animation',
+                label: '主色渐变',
+                value: 'color',
               },
               {
                 label: '封面模糊',
                 value: 'blur',
               },
               {
-                label: '主色渐变',
-                value: 'gradient',
+                label: '流体效果',
+                value: 'animation',
               },
             ]"
             class="set"
           />
-        </n-card>
-        <n-card class="set-item">
-          <div class="name">
-            显示前奏倒计时
-            <n-text class="tip">部分歌曲前奏可能存在显示错误</n-text>
-          </div>
-          <n-switch v-model:value="countDownShow" :round="false" />
-        </n-card>
-        <n-card class="set-item">
-          <div class="name">
-            尝试替换无法播放的歌曲
-            <n-text class="tip">
-              {{ checkPlatform.electron() ? "可能会造成音乐与原曲不符" : "客户端独占功能" }}
-            </n-text>
-          </div>
-          <n-switch
-            v-model:value="useUnmServer"
-            :disabled="!checkPlatform.electron()"
-            :round="false"
-          />
-        </n-card>
-        <n-card class="set-item">
-          <div class="name">
-            <div class="dev">
-              显示音乐频谱
-              <n-tag :bordered="false" round size="small" type="warning">
-                开发中
-                <template #icon>
-                  <n-icon>
-                    <SvgIcon icon="code" />
-                  </n-icon>
-                </template>
-              </n-tag>
-            </div>
-            <n-text class="tip">
-              {{
-                showSpectrums
-                  ? "开启音乐频谱会极大影响性能，如遇问题请关闭"
-                  : "是否在播放器底部显示音乐频谱"
-              }}
-            </n-text>
-          </div>
-          <n-switch v-model:value="showSpectrums" :round="false" />
         </n-card>
       </div>
       <!-- 歌词 -->
       <div class="set-type">
         <n-h3 prefix="bar"> 歌词 </n-h3>
-        <n-card
-          class="set-item"
-          :content-style="{
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }"
-        >
-          <div class="name">
-            歌词文本大小
-            <n-text :style="{ fontSize: lyricsFontSize + 'px', fontWeight: 'bold' }" class="tip">
-              我是一句歌词
-            </n-text>
-          </div>
-          <n-slider
-            v-model:value="lyricsFontSize"
-            :tooltip="false"
-            :max="56"
-            :min="36"
-            :step="1"
-            :marks="{
-              36: '最小',
-              46: '默认',
-              56: '最大',
-            }"
-          />
-        </n-card>
-        <n-card class="set-item">
-          <div class="name">
-            智能暂停滚动
-            <n-text class="tip">鼠标移入歌词区域是否暂停滚动</n-text>
-          </div>
-          <n-switch v-model:value="lrcMousePause" :round="false" />
-        </n-card>
         <n-card class="set-item">
           <div class="name">
             歌词位置
-            <n-text class="tip">歌词的默认垂直位置</n-text>
+            <n-text class="tip">歌词显示在播放器的位置</n-text>
           </div>
           <n-select
             v-model:value="lyricsPosition"
             :options="[
               {
-                label: '居左',
-                value: 'left',
-              },
-              {
-                label: '居中',
-                value: 'center',
-              },
-              {
-                label: '居右',
+                label: '右侧',
                 value: 'right',
+              },
+              {
+                label: '底部',
+                value: 'bottom',
               },
             ]"
             class="set"
@@ -425,19 +341,23 @@
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            歌词滚动位置
-            <n-text class="tip">歌词高亮时所处的位置</n-text>
+            歌词模式
+            <n-text class="tip">显示的歌词类型</n-text>
           </div>
           <n-select
             v-model:value="lyricsBlock"
             :options="[
               {
-                label: '靠近顶部',
-                value: 'start',
+                label: '逐字歌词',
+                value: 'yrc',
               },
               {
-                label: '水平居中',
-                value: 'center',
+                label: '普通歌词',
+                value: 'lrc',
+              },
+              {
+                label: '自动选择',
+                value: 'auto',
               },
             ]"
             class="set"
@@ -445,58 +365,72 @@
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            <div class="dev">
-              显示逐字歌词
-              <n-tag :bordered="false" round size="small" type="warning">
-                开发中
-                <template #icon>
-                  <n-icon>
-                    <SvgIcon icon="code" />
-                  </n-icon>
-                </template>
-              </n-tag>
-            </div>
-            <n-text class="tip">是否在具有逐字歌词时显示</n-text>
+            显示逐字歌词
+            <n-text class="tip">时间精度精确到字</n-text>
           </div>
           <n-switch v-model:value="showYrc" :round="false" />
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            <div class="dev">
-              显示逐字歌词动画
-              <n-tag :bordered="false" round size="small" type="warning">
-                开发中
-                <template #icon>
-                  <n-icon>
-                    <SvgIcon icon="code" />
-                  </n-icon>
-                </template>
-              </n-tag>
-            </div>
-            <n-text class="tip">可能会造成卡顿等性能问题，建议显卡为 GTX 2060 及以上</n-text>
+            逐字歌词动画
+            <n-text class="tip">逐字歌词字体大小变化</n-text>
           </div>
           <n-switch v-model:value="showYrcAnimation" :disabled="!showYrc" :round="false" />
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            显示歌词翻译
-            <n-text class="tip">是否在具有翻译歌词时显示</n-text>
-          </div>
-          <n-switch v-model:value="showTransl" :round="false" />
-        </n-card>
-        <n-card class="set-item">
-          <div class="name">
-            显示歌词音译
-            <n-text class="tip">是否在具有音译歌词时显示</n-text>
+            音译歌词
+            <n-text class="tip">显示非中文歌词的音译版本</n-text>
           </div>
           <n-switch v-model:value="showRoma" :round="false" />
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            歌词自动聚焦
-            <n-text class="tip">是否聚焦显示当前播放行，其他行将模糊显示</n-text>
+            翻译歌词
+            <n-text class="tip">显示歌词的翻译版本</n-text>
+          </div>
+          <n-switch v-model:value="showTransl" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="name">
+            歌词字体大小
+            <n-text class="tip">（{{ lyricsFontSize }}px）</n-text>
+          </div>
+          <n-slider
+            v-model:value="lyricsFontSize"
+            :min="12"
+            :max="48"
+            :step="1"
+            style="width: 200px"
+          />
+        </n-card>
+        <n-card class="set-item">
+          <div class="name">
+            歌词模糊
+            <n-text class="tip">将非当前歌词进行模糊处理</n-text>
           </div>
           <n-switch v-model:value="lyricsBlur" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="name">
+            鼠标悬停暂停
+            <n-text class="tip">将鼠标悬停在歌词上时，是否暂停音乐播放</n-text>
+          </div>
+          <n-switch v-model:value="lrcMousePause" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="name">
+            歌词倒计时
+            <n-text class="tip">在播放结束前 N 秒提醒</n-text>
+          </div>
+          <n-switch v-model:value="countDownShow" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="name">
+            使用网易云 UNM 服务器
+            <n-text class="tip">某些需特殊权限的歌词可能需要此选项</n-text>
+          </div>
+          <n-switch v-model:value="useUnmServer" :round="false" />
         </n-card>
       </div>
       <!-- 下载 -->
@@ -504,88 +438,60 @@
         <n-h3 prefix="bar"> 下载 </n-h3>
         <n-card class="set-item">
           <div class="name">
-            默认下载文件夹
-            <n-text class="tip">{{ downloadPath || "不设置则会每次选择保存位置" }}</n-text>
+            下载位置
+            <n-text class="tip">{{ downloadPath }}</n-text>
           </div>
-          <n-flex>
-            <Transition name="fade" mode="out-in">
-              <n-button
-                v-if="downloadPath"
-                type="error"
-                strong
-                secondary
-                @click="downloadPath = null"
-              >
-                清除
-              </n-button>
-            </Transition>
-            <n-button :disabled="!checkPlatform.electron()" strong secondary @click="choosePath">
-              更改
-            </n-button>
-          </n-flex>
+          <n-button @click="selectDownloadPath">选择位置</n-button>
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            同时下载歌曲元信息
-            <n-text class="tip">为当前下载歌曲附加封面及歌词等元信息</n-text>
+            下载音乐元数据
+            <n-text class="tip">保存歌曲的标签信息</n-text>
           </div>
           <n-switch v-model:value="downloadMeta" :round="false" />
         </n-card>
         <n-card class="set-item">
-          <div class="name">下载歌曲时同时下载封面</div>
-          <n-switch v-model:value="downloadCover" :disabled="!downloadMeta" :round="false" />
+          <div class="name">
+            下载音乐封面
+            <n-text class="tip">保存歌曲的专辑封面</n-text>
+          </div>
+          <n-switch v-model:value="downloadCover" :round="false" />
         </n-card>
         <n-card class="set-item">
-          <div class="name">下载歌曲时同时下载歌词</div>
-          <n-switch v-model:value="downloadLyrics" :disabled="!downloadMeta" :round="false" />
+          <div class="name">
+            下载音乐歌词
+            <n-text class="tip">保存歌曲的歌词文件</n-text>
+          </div>
+          <n-switch v-model:value="downloadLyrics" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="name">
+            下载加载大小
+            <n-text class="tip">单位 MB，超过此大小的文件将自动跳过（设置为0表示不限制）</n-text>
+          </div>
+          <n-input-number v-model:value="loadSize" :min="0" class="set" />
         </n-card>
       </div>
       <!-- 其他 -->
       <div class="set-type">
         <n-h3 prefix="bar"> 其他 </n-h3>
-          <n-card class="set-item">
-            <div class="name">TuneFree当前版本：{{ packageJson.version }}</div>
-            <div class="donate-link">
-              <n-button type="info" @click="toUpdate">
-                检查更新
-              </n-button>
-            </div>
-          </n-card>
         <n-card class="set-item">
-          <div class="name">显示 官网跳转 按钮</div>
-          <n-switch v-model:value="showGithub" :round="false" />
+          <div class="name">
+            检查更新
+            <n-text class="tip">当前版本：{{ packageJson.version }}</n-text>
+          </div>
+          <n-button @click="toUpdate">检查更新</n-button>
         </n-card>
         <n-card class="set-item">
           <div class="name">
-            默认加载数量
-            <n-text class="tip">在部分列表页面显示几条数据</n-text>
+            显示频谱
+            <n-text class="tip">播放时显示音乐频谱效果（较消耗性能）</n-text>
           </div>
-          <n-select
-            v-model:value="loadSize"
-            :options="[
-              {
-                label: '少一点（ 30 条 ）',
-                value: 30,
-              },
-              {
-                label: '差不多刚刚好（ 50 条 ）',
-                value: 50,
-              },
-              {
-                label: '我要很多（ 100 条 ）',
-                value: 100,
-              },
-            ]"
-            class="set"
-            @update:value="themeAuto = false"
-          />
+          <n-switch v-model:value="showSpectrums" :round="false" />
         </n-card>
         <n-card class="set-item">
-          <div class="name">
-            程序重置
-            <n-text class="tip">若程序显示异常或出现问题时可尝试此操作</n-text>
-          </div>
-          <n-button strong secondary type="error" @click="resetApp"> 重置 </n-button>
+          <div class="name">程序重置</div>
+          <n-button type="warning" @click="resetApp">重置</n-button>
         </n-card>
       </div>
     </n-scrollbar>
@@ -646,7 +552,6 @@ const {
   downloadLyrics,
   showDesktopLyric,
 } = storeToRefs(settings);
-
 
 // 标签页数据
 const setTabsRef = ref(null);
@@ -725,40 +630,47 @@ const allSetScroll = debounce((e) => {
 }, 100);
 
 // 关闭任务栏进度
-  if (selectedDir) downloadPath.value = selectedDir;if (!val) electron.ipcRenderer.send("setProgressBar", "close");
-};};
+const closeTaskbarProgress = (val) => {
+  if (!val) electron.ipcRenderer.send("setProgressBar", "close");
+};
+
+// 选择下载位置
+const selectDownloadPath = async () => {
+  const selectedDir = await electron.ipcRenderer.invoke("selectDir", true);
+  if (selectedDir) downloadPath.value = selectedDir;
+};
 
 // 跳转
 const jump = () => {
-  window.open(packageJson.home);const selectedDir = await electron.ipcRenderer.invoke("selectDir", true);
-};  if (selectedDir) downloadPath.value = selectedDir;
+  window.open(packageJson.home);
+};
 
 // 程序重置
 const resetApp = () => {
-  $dialog.warning({ {
+  $dialog.warning({
     title: "程序重置",
     content: "确认重置为默认状态？你的登录状态以及自定义设置都将丢失！",
     positiveText: "重置",
     negativeText: "取消",
     onPositiveClick: () => {
       if (typeof $cleanAll === "undefined") {
-        return $message.error("重置操作出现错误，请重试");le: "程序重置",
-      }？你的登录状态以及自定义设置都将丢失！",
+        return $message.error("重置操作出现错误，请重试");
+      }
       $cleanAll(false);
       $message.success("重置成功，正在重启");
       setTimeout(() => {
         if (checkPlatform.electron()) {
-          electron.ipcRenderer.send("window-relaunch");message.error("重置操作出现错误，请重试");
+          electron.ipcRenderer.send("window-relaunch");
         } else {
-          window.location.href = "/";eanAll(false);
-        }success("重置成功，正在重启");
-      }, 1000);setTimeout(() => {
-    },   if (checkPlatform.electron()) {
-  });        electron.ipcRenderer.send("window-relaunch");
-}; else {
-</script>          window.location.href = "/";
+          window.location.href = "/";
+        }
+      }, 1000);
+    },
+  });
+};
+</script>
 
-<style lang="scss" scoped>000);
+<style lang="scss" scoped>
 .setting {
   max-width: 1200px;
   margin: 0 auto;
@@ -766,11 +678,11 @@ const resetApp = () => {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    height: 58px;;
+    height: 58px;
     margin: 20px 0;
     font-size: 36px;
-    font-weight: bold;x;
-    .copyright {row;
+    font-weight: bold;
+    .copyright {
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -778,31 +690,31 @@ const resetApp = () => {
       margin-bottom: 6px;
       font-size: 16px;
       font-weight: normal;
-      cursor: pointer;ction: row;
-      .author {ter;
+      cursor: pointer;
+      .author {
         display: flex;
-        align-items: center;m: 6px;
+        align-items: center;
         &::after {
           content: "/";
           transform: translateY(2px);
           font-size: 14px;
           margin: 0 6px;
-          opacity: 0.6;lign-items: center;
+          opacity: 0.6;
         }
         .author-text {
-          margin-left: 6px; transform: translateY(2px);
-        }   font-size: 14px;
-      }: 0 6px;
-      .version {0.6;
+          margin-left: 6px;
+        }
+      }
+      .version {
         &::before {
           content: "v";
-          margin-right: 2px; margin-left: 6px;
-        } }
-      } }
-    }   .version {
-  }before {
-  .n-tabs {: "v";
-    height: 42px;       margin-right: 2px;
+          margin-right: 2px;
+        }
+      }
+    }
+  }
+  .n-tabs {
+    height: 42px;
   }
   .set-type {
     padding-top: 30px;
@@ -811,53 +723,46 @@ const resetApp = () => {
       border-radius: 8px;
       margin-bottom: 12px;
       &:last-child {
-        margin-bottom: 0;ding-top: 30px;
+        margin-bottom: 0;
       }
       :deep(.n-card__content) {
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: space-between; margin-bottom: 0;
+        justify-content: space-between;
       }
-      .name {tent) {
+      .name {
         font-size: 16px;
         display: flex;
         flex-direction: column;
-        padding-right: 20px;y-content: space-between;
+        padding-right: 20px;
         .dev {
           display: flex;
           flex-direction: row;
-          align-items: center;lex;
-          .n-tag {n;
-            margin-left: 6px;ding-right: 20px;
-          }dev {
-        }lay: flex;
-        .tip {row;
-          font-size: 12px;center;
-          opacity: 0.8; .n-tag {
-        }     margin-left: 6px;
+          align-items: center;
+          .n-tag {
+            margin-left: 6px;
+          }
+        }
+        .tip {
+          font-size: 12px;
+          opacity: 0.8;
+        }
       }
       .set {
         width: 200px;
-        @media (max-width: 768px) {px;
+        @media (max-width: 768px) {
           width: 140px;
           min-width: 140px;
         }
-      } .set {
-    }     width: 200px;
-  }(max-width: 768px) {
-  &.use-cover {: 140px;
-    .n-switch {;
+      }
+    }
+  }
+  &.use-cover {
+    .n-switch {
       &.n-switch--active {
         :deep(.n-switch__rail) {
           background-color: var(--main-second-color);
-        }
-      }se-cover {
-    } .n-switch {
-  }     &.n-switch--active {
-}:deep(.n-switch__rail) {
-</style>          background-color: var(--main-second-color);
-
         }
       }
     }
