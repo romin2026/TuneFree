@@ -119,7 +119,7 @@ jobs:
       - name: clean dist
         if: needs.Build.outputs.x86 == 1
         run: rm dist -Recurse -Force
-        - name: pack x86_64
+      - name: pack x86_64
         run: pnpm exec electron-builder --win --x64 --config --publish never
       - name: reg windows x64 packs
         if: needs.Build.outputs.x86_64 == 1
