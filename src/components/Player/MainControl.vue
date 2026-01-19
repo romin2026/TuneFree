@@ -389,8 +389,15 @@ const {
   playSongMode,
   playHeartbeatMode,
 } = storeToRefs(status);
-const { showYrc, bottomLyricShow, showSider, showPlaylistCount, showSpectrums, playCoverType } =
-  storeToRefs(settings);
+const { 
+  showYrc, 
+  bottomLyricShow, 
+  showSider, 
+  showPlaylistCount, 
+  showSpectrums, 
+  playCoverType,
+  showDesktopLyric,
+} = storeToRefs(settings);
 
 // 子组件
 const addPlaylistRef = ref(null);
@@ -566,15 +573,16 @@ const showDesktopLyric = ref(false);
 
 // 切换桌面歌词的显示状态
 const toggleDesktopLyric = () => {
-
   showDesktopLyric.value = !showDesktopLyric.value;
-
   $message.success(`桌面歌词已${showDesktopLyric.value ? '开启' : '关闭'}`);
 };
 
+// 监听桌面歌词设置变化
 watch(showDesktopLyric, (newValue) => {
-  electron.ipcRenderer.send(newValue ? 'lyric-show' : 'lyric-hide')
-})
+  if (checkPlatform.electron()) {
+    electron.ipcRenderer.send(newValue ? 'lyric-show' : 'lyric-hide');
+  }
+});
 
 // 监听歌词索引变化
 watch(playSongLyricIndex, (newIndex) => {

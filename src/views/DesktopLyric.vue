@@ -21,11 +21,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onBeforeUnmount } from 'vue';
+import { onMounted, ref, onBeforeUnmount, watch } from 'vue';
 
 let winPos = null;
 let dragging = false;
-const currentLyric = ref('');
+const currentLyric = ref('😘TuneFree By Sayqz🌴');
 const isTransitioning = ref(false);
 const isLocked = ref(false);
 const isLockHovered = ref(false);
@@ -44,6 +44,8 @@ const lyricColors = ref([
     '#ff4500', '#ff8c00', '#ffd700', '#ffdead', '#f5f5dc',
 ]);
 const currentColorIndex = ref(parseInt(localStorage.getItem('currentColorIndex'), 10) || 0); 
+
+let lyricInterval = null;
 
 const winDown = (ev) => {
     dragging = true;
@@ -85,27 +87,32 @@ watch(isLockHovered, (flag) => {
 });
 
 const updateLyrics = () => {
-    const newIndex = parseInt(localStorage.getItem('newIndex'), 10);
-    let newCurrentLyric = '';
+    try {
+        const newIndex = parseInt(localStorage.getItem('newIndex'), 10);
+        let newCurrentLyric = '';
 
-    if (newIndex === -1) {
-        newCurrentLyric = '😘TuneFree By Sayqz🌴';
-    } else {
-        newCurrentLyric = localStorage.getItem('currentLyric') || '';
-    }
+        if (newIndex === -1 || isNaN(newIndex)) {
+            newCurrentLyric = '😘TuneFree By Sayqz🌴';
+        } else {
+            newCurrentLyric = localStorage.getItem('currentLyric') || '😘TuneFree By Sayqz🌴';
+        }
 
-    if (newCurrentLyric !== currentLyric.value) {
-        isTransitioning.value = true; 
-        setTimeout(() => {
-            currentLyric.value = newCurrentLyric;
-            isTransitioning.value = false; 
-        }, 300); 
+        if (newCurrentLyric !== currentLyric.value) {
+            isTransitioning.value = true; 
+            setTimeout(() => {
+                currentLyric.value = newCurrentLyric;
+                isTransitioning.value = false; 
+            }, 300); 
+        }
+    } catch (error) {
+        console.error('更新歌词出错:', error);
+        currentLyric.value = '😘TuneFree By Sayqz🌴';
     }
 }
 
 const toggleLyricColor = () => {
-    currentColorIndex.value = (currentColorIndex.value + 1) % lyricColors.value.length; // 循环选择下一个颜色
-    localStorage.setItem('currentColorIndex', currentColorIndex.value); // 保存当前颜色索引到 localStorage
+    currentColorIndex.value = (currentColorIndex.value + 1) % lyricColors.value.length;
+    localStorage.setItem('currentColorIndex', currentColorIndex.value);
 }
 
 onMounted(() => {
@@ -113,11 +120,18 @@ onMounted(() => {
     window.addEventListener("mousemove", winMove);
     window.addEventListener("mouseup", winUp);
 
-    const lyricInterval = setInterval(updateLyrics, 200);
+    lyricInterval = setInterval(updateLyrics, 200);
+    updateLyrics();
+});
 
-    onBeforeUnmount(() => {
+onBeforeUnmount(() => {
+    window.removeEventListener("mousedown", winDown);
+    window.removeEventListener("mousemove", winMove);
+    window.removeEventListener("mouseup", winUp);
+    if (lyricInterval) {
         clearInterval(lyricInterval);
-    });
+        lyricInterval = null;
+    }
 });
 </script>
 

@@ -194,6 +194,13 @@
             @update:value="closeTaskbarProgress"
           />
         </n-card>
+        <n-card class="set-item">
+          <div class="name">
+            显示桌面歌词
+            <n-text class="tip">在播放时显示浮窗歌词，方便随时了解歌词内容</n-text>
+          </div>
+          <n-switch v-model:value="showDesktopLyric" :round="false" />
+        </n-card>
       </div>
       <div v-else class="set-type">
         <n-h3 prefix="bar"> 系统 </n-h3>
@@ -637,6 +644,7 @@ const {
   downloadMeta,
   downloadCover,
   downloadLyrics,
+  showDesktopLyric,
 } = storeToRefs(settings);
 
 
@@ -717,47 +725,40 @@ const allSetScroll = debounce((e) => {
 }, 100);
 
 // 关闭任务栏进度
-const closeTaskbarProgress = (val) => {
-  if (!val) electron.ipcRenderer.send("setProgressBar", "close");
-};
-
-// 更改下载目录
-const choosePath = async () => {
-  const selectedDir = await electron.ipcRenderer.invoke("selectDir", true);
-  if (selectedDir) downloadPath.value = selectedDir;
-};
+  if (selectedDir) downloadPath.value = selectedDir;if (!val) electron.ipcRenderer.send("setProgressBar", "close");
+};};
 
 // 跳转
 const jump = () => {
-  window.open(packageJson.home);
-};
+  window.open(packageJson.home);const selectedDir = await electron.ipcRenderer.invoke("selectDir", true);
+};  if (selectedDir) downloadPath.value = selectedDir;
 
 // 程序重置
 const resetApp = () => {
-  $dialog.warning({
+  $dialog.warning({ {
     title: "程序重置",
     content: "确认重置为默认状态？你的登录状态以及自定义设置都将丢失！",
     positiveText: "重置",
     negativeText: "取消",
     onPositiveClick: () => {
       if (typeof $cleanAll === "undefined") {
-        return $message.error("重置操作出现错误，请重试");
-      }
+        return $message.error("重置操作出现错误，请重试");le: "程序重置",
+      }？你的登录状态以及自定义设置都将丢失！",
       $cleanAll(false);
       $message.success("重置成功，正在重启");
       setTimeout(() => {
         if (checkPlatform.electron()) {
-          electron.ipcRenderer.send("window-relaunch");
+          electron.ipcRenderer.send("window-relaunch");message.error("重置操作出现错误，请重试");
         } else {
-          window.location.href = "/";
-        }
-      }, 1000);
-    },
-  });
-};
-</script>
+          window.location.href = "/";eanAll(false);
+        }success("重置成功，正在重启");
+      }, 1000);setTimeout(() => {
+    },   if (checkPlatform.electron()) {
+  });        electron.ipcRenderer.send("window-relaunch");
+}; else {
+</script>          window.location.href = "/";
 
-<style lang="scss" scoped>
+<style lang="scss" scoped>000);
 .setting {
   max-width: 1200px;
   margin: 0 auto;
@@ -765,11 +766,11 @@ const resetApp = () => {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    height: 58px;
+    height: 58px;;
     margin: 20px 0;
     font-size: 36px;
-    font-weight: bold;
-    .copyright {
+    font-weight: bold;x;
+    .copyright {row;
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -777,31 +778,31 @@ const resetApp = () => {
       margin-bottom: 6px;
       font-size: 16px;
       font-weight: normal;
-      cursor: pointer;
-      .author {
+      cursor: pointer;ction: row;
+      .author {ter;
         display: flex;
-        align-items: center;
+        align-items: center;m: 6px;
         &::after {
           content: "/";
           transform: translateY(2px);
           font-size: 14px;
           margin: 0 6px;
-          opacity: 0.6;
+          opacity: 0.6;lign-items: center;
         }
         .author-text {
-          margin-left: 6px;
-        }
-      }
-      .version {
+          margin-left: 6px; transform: translateY(2px);
+        }   font-size: 14px;
+      }: 0 6px;
+      .version {0.6;
         &::before {
           content: "v";
-          margin-right: 2px;
-        }
-      }
-    }
-  }
-  .n-tabs {
-    height: 42px;
+          margin-right: 2px; margin-left: 6px;
+        } }
+      } }
+    }   .version {
+  }before {
+  .n-tabs {: "v";
+    height: 42px;       margin-right: 2px;
   }
   .set-type {
     padding-top: 30px;
@@ -810,46 +811,53 @@ const resetApp = () => {
       border-radius: 8px;
       margin-bottom: 12px;
       &:last-child {
-        margin-bottom: 0;
+        margin-bottom: 0;ding-top: 30px;
       }
       :deep(.n-card__content) {
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: space-between;
+        justify-content: space-between; margin-bottom: 0;
       }
-      .name {
+      .name {tent) {
         font-size: 16px;
         display: flex;
         flex-direction: column;
-        padding-right: 20px;
+        padding-right: 20px;y-content: space-between;
         .dev {
           display: flex;
           flex-direction: row;
-          align-items: center;
-          .n-tag {
-            margin-left: 6px;
-          }
-        }
-        .tip {
-          font-size: 12px;
-          opacity: 0.8;
-        }
+          align-items: center;lex;
+          .n-tag {n;
+            margin-left: 6px;ding-right: 20px;
+          }dev {
+        }lay: flex;
+        .tip {row;
+          font-size: 12px;center;
+          opacity: 0.8; .n-tag {
+        }     margin-left: 6px;
       }
       .set {
         width: 200px;
-        @media (max-width: 768px) {
+        @media (max-width: 768px) {px;
           width: 140px;
           min-width: 140px;
         }
-      }
-    }
-  }
-  &.use-cover {
-    .n-switch {
+      } .set {
+    }     width: 200px;
+  }(max-width: 768px) {
+  &.use-cover {: 140px;
+    .n-switch {;
       &.n-switch--active {
         :deep(.n-switch__rail) {
           background-color: var(--main-second-color);
+        }
+      }se-cover {
+    } .n-switch {
+  }     &.n-switch--active {
+}:deep(.n-switch__rail) {
+</style>          background-color: var(--main-second-color);
+
         }
       }
     }
