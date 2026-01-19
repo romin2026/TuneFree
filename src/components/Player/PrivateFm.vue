@@ -117,7 +117,7 @@
               </n-icon>
               <span>私人 FM</span>
             </div>
-            <span v-if="!isLogin()" class="tip"> 未登录模式 </span>
+            <span v-if="!isLogin()" class="tip"> 本地模式 </span>
           </div>
         </div>
       </div>

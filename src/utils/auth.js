@@ -1,8 +1,8 @@
 import { siteData } from "@/stores";
 
 /**
- * 检查用户是否已登录
- * @returns {boolean} 如果用户已登录，则返回 true；否则返回 false
+ * 检查本地用户信息是否可用
+ * @returns {boolean} 如果本地用户信息存在，则返回 true；否则返回 false
  */
 export const isLogin = () => {
   const data = siteData();

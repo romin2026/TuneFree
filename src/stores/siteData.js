@@ -7,14 +7,12 @@ import {
   getUserDetail,
   getUserSubcount,
   getLikelist,
-  setLikeSong,
   getUserPlaylist,
   getUserArtist,
   getUserAlbum,
   getUserMv,
   getUserDj,
 } from "@/api/user";
-import { isLogin } from "@/utils/auth";
 import formatData from "@/utils/formatData";
 import throttle from "@/utils/throttle";
 
@@ -54,17 +52,13 @@ const useSiteDataStore = defineStore("siteData", {
   getters: {
     // 获取用户喜欢的音乐歌单 id
     getUserLikePlaylistId() {
-      return isLogin() ? this.userLikeData.playlists?.[0]?.id || null : null;
+      return this.userLikeData.playlists?.[0]?.id || null;
     },
   },
   actions: {
     // 获取每日推荐
     async setDailySongsData(refresh = false) {
       try {
-        if (!isLogin()) {
-          this.dailySongsData = { timestamp: null, data: [] };
-          return false;
-        }
         const songsData = this.dailySongsData.data;
         const timestamp = this.dailySongsData.timestamp;
         // 下一天六点
@@ -110,7 +104,6 @@ const useSiteDataStore = defineStore("siteData", {
     // 获取用户信息
     async setUserProfile() {
       try {
-        if (!isLogin()) return false;
         // 获取用户基本数据
         const userProfile = await getUserProfile();
         this.userData.detail = userProfile;
@@ -137,7 +130,7 @@ const useSiteDataStore = defineStore("siteData", {
     // 获取用户喜欢歌曲
     async setUserLikeSongs() {
       try {
-        if (!isLogin() || !this.userData.userId) return false;
+        if (!this.userData.userId) return false;
         // 获取数据
         getLikelist(this.userData.userId).then((res) => {
           this.userLikeData.songs = res.ids;
@@ -149,7 +142,7 @@ const useSiteDataStore = defineStore("siteData", {
     // 获取用户喜欢歌单
     async setUserLikePlaylists() {
       try {
-        if (!isLogin() || !this.userData.userId) return false;
+        if (!this.userData.userId) return false;
         // 计算数量
         const { createdPlaylistCount, subPlaylistCount } = this.userData.subcount;
         const number = createdPlaylistCount + subPlaylistCount ?? 50;
@@ -164,7 +157,6 @@ const useSiteDataStore = defineStore("siteData", {
     // 更改用户喜欢歌手
     async setUserLikeArtists() {
       try {
-        if (!isLogin()) return false;
         // 获取数据
         getUserArtist().then((res) => {
           this.userLikeData.artists = formatData(res.data, "artist");
@@ -176,7 +168,6 @@ const useSiteDataStore = defineStore("siteData", {
     // 更改用户喜欢专辑
     async setUserLikeAlbums() {
       try {
-        if (!isLogin()) return false;
         // 必要数据
         let offset = 0;
         let totalCount = null;
@@ -196,7 +187,6 @@ const useSiteDataStore = defineStore("siteData", {
     // 更改用户喜欢视频
     async setUserLikeMvs() {
       try {
-        if (!isLogin()) return false;
         // 获取数据
         getUserMv().then((res) => {
           this.userLikeData.mvs = formatData(res.data, "mv");
@@ -208,7 +198,6 @@ const useSiteDataStore = defineStore("siteData", {
     // 更改用户喜欢电台
     async setUserLikeDjs() {
       try {
-        if (!isLogin()) return false;
         // 获取数据
         getUserDj().then((res) => {
           this.userLikeData.djs = formatData(res.djRadios, "dj");
@@ -245,34 +234,19 @@ const showError = (error, msg, show = true) => {
 const changeLikeListsData = throttle(
   async (id, like, isPath, $this) => {
     try {
-      if (!isLogin()) {
-        if (isPath) return $message.warning("本地歌曲暂不支持该操作");
-        const list = $this.userLikeData.songs;
-        const exists = list.includes(id);
-        if (like && !exists) {
-          list.push(id);
-          $message.success("已加入本地喜欢列表");
-        } else if (!like && exists) {
-          list.splice(list.indexOf(id), 1);
-          $message.success("已从本地喜欢列表移除");
-        } else if (like && exists) {
-          $message.info("我喜欢的音乐中已存在该歌曲");
-        }
-        return true;
-      }
       if (isPath) return $message.warning("本地歌曲暂不支持该操作");
       const list = $this.userLikeData.songs;
       const exists = list.includes(id);
-      const res = await setLikeSong(id, like);
-      if (res.code === 200) {
-        if (like && !exists) {
-          list.push(id);
-        } else if (!like && exists) {
-          list.splice(list.indexOf(id), 1);
-        } else if (like && exists) {
-          $message.info("我喜欢的音乐中已存在该歌曲");
-        }
-      } else $message.error(like ? "喜欢音乐时发生错误" : "取消喜欢音乐时发生错误");
+      if (like && !exists) {
+        list.push(id);
+        $message.success("已加入我的最爱");
+      } else if (!like && exists) {
+        list.splice(list.indexOf(id), 1);
+        $message.success("已从我的最爱移除");
+      } else if (like && exists) {
+        $message.info("我的最爱中已存在该歌曲");
+      }
+      return true;
     } catch (error) {
       console.error("歌曲喜欢操作失败：", error);
       $message.error("歌曲喜欢失败，请重试");

@@ -6,7 +6,7 @@ import idMeta from "@/assets/idMeta.json";
  */
 
 /**
- * 每日推荐 - 需要登录
+ * 每日推荐
  * @param {string} [type] - 推荐类型，songs 日推歌曲 / resource 推荐歌单
  */
 export const getDailyRec = (type = "songs") => {

@@ -13,9 +13,6 @@
   >
     <Transition name="fade" mode="out-in">
       <div v-if="songData">
-        <n-alert v-if="songData.pc" :show-icon="false" class="tip">
-          当前为云盘歌曲，下载的文件均为最高音质
-        </n-alert>
         <n-radio-group v-model:value="downloadChoose" class="download-group" name="downloadGroup">
           <n-flex vertical>
             <n-radio
@@ -60,16 +57,12 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useRouter } from "vue-router";
-import { siteData, siteSettings } from "@/stores";
+import { siteSettings } from "@/stores";
 import { getSongDetail, getSongDownload, getSongLyric } from "@/api/song";
 import { downloadFile, checkPlatform } from "@/utils/helper";
 import formatData from "@/utils/formatData";
 
-const router = useRouter();
-const data = siteData();
 const settings = siteSettings();
-const { userData } = storeToRefs(data);
 const {
   downloadPath,
   downloadMeta,
@@ -215,18 +208,6 @@ const openDownloadModal = (data) => {
     downloadSongShow.value = true;
     getMusicDetailData(songId.value);
   };
-  if (
-    router.currentRoute.value.name === "cloud" ||
-    data?.fee === 0 ||
-    data?.pc ||
-    userData.value.detail?.profile?.vipType !== 0
-  ) {
-    return toDownload();
-  }
-  // 权限不足
-  if (data?.fee !== 0 && userData.value.detail?.profile?.vipType !== 11 && !data?.pc) {
-    return toDownload();
-  }
   return toDownload();
 };
 
@@ -247,10 +228,6 @@ defineExpose({
 
 <style lang="scss" scoped>
 .download-song {
-  .tip {
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
   .download-group {
     .song-data {
       .size {

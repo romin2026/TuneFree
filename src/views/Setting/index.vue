@@ -649,7 +649,7 @@ const jump = () => {
 const resetApp = () => {
   $dialog.warning({
     title: "程序重置",
-    content: "确认重置为默认状态？你的登录状态以及自定义设置都将丢失！",
+    content: "确认重置为默认状态？你的本地数据与自定义设置都将丢失！",
     positiveText: "重置",
     negativeText: "取消",
     onPositiveClick: () => {

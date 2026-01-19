@@ -27,7 +27,6 @@ import { NIcon, NText, NButton, NAvatar } from "naive-ui";
 import { useRouter, RouterLink } from "vue-router";
 import { getHeartRateList } from "@/api/playlist";
 import { checkPlatform } from "@/utils/helper";
-import { isLogin } from "@/utils/auth";
 import { fadePlayOrPause, initPlayer } from "@/utils/Player";
 import formatData from "@/utils/formatData";
 import debounce from "@/utils/debounce";
@@ -58,21 +57,19 @@ const userPlaylists = ref({
   label: () =>
     h("div", { class: "user-list" }, [
       h("span", { class: "name" }, ["创建的歌单"]),
-      isLogin()
-        ? h(NButton, {
-            class: "add",
-            size: "small",
-            type: "tertiary",
-            round: true,
-            strong: true,
-            secondary: true,
-            renderIcon: renderIcon("add"),
-            onclick: (event) => {
-              event.stopPropagation();
-              createPlaylistRef.value?.openCreatePlaylist();
-            },
-          })
-        : null,
+      h(NButton, {
+        class: "add",
+        size: "small",
+        type: "tertiary",
+        round: true,
+        strong: true,
+        secondary: true,
+        renderIcon: renderIcon("add"),
+        onclick: (event) => {
+          event.stopPropagation();
+          createPlaylistRef.value?.openCreatePlaylist();
+        },
+      }),
     ]),
   key: "user-playlists",
   children: [],
@@ -176,7 +173,7 @@ const menuOptions = computed(() => [
               },
             },
             [
-              h("span", null, ["喜欢的音乐"]),
+              h("span", null, ["我的最爱"]),
               h(NButton, {
                 size: "small",
                 type: "tertiary",
@@ -231,20 +228,6 @@ const menuOptions = computed(() => [
         RouterLink,
         {
           to: {
-            name: "cloud",
-          },
-        },
-        () => ["我的云盘"],
-      ),
-    key: "cloud",
-    icon: renderIcon("cloud"),
-  },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
             name: "history",
           },
         },
@@ -263,8 +246,7 @@ const menuOptions = computed(() => [
 
 // 更改用户的歌单
 const changeUserPlaylists = (data) => {
-  // 未登录
-  if (!isLogin() || !data?.length) {
+  if (!data?.length) {
     userPlaylists.value.children = [];
     favoritePlaylists.value.children = [];
     return false;
@@ -412,7 +394,6 @@ const checkMenuItem = async (key) => {
 // 开启心动模式
 const startHeartRate = debounce(async () => {
   try {
-    if (!isLogin()) return false;
     if (playHeartbeatMode.value) return fadePlayOrPause();
     // 基础数据
     const likeSongs = userLikeData.value.songs;

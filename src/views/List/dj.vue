@@ -205,7 +205,6 @@ import { storeToRefs } from "pinia";
 import { siteData } from "@/stores";
 import { getDjDetail, getDjProgram, likeDj } from "@/api/dj";
 import { fuzzySearch } from "@/utils/helper";
-import { isLogin } from "@/utils/auth";
 import { getTimestampTime } from "@/utils/timeTools";
 import { playAllSongs } from "@/utils/Player";
 import debounce from "@/utils/debounce";
@@ -317,7 +316,6 @@ const isLikeOrDislike = (id) => {
 // 订阅 / 取消订阅电台
 const likeOrDislike = debounce(async (id) => {
   try {
-    if (!isLogin()) return $message.warning("请登录后使用");
     const type = isLikeOrDislike(id) ? 1 : 0;
     const result = await likeDj(id, type);
     if (result.code === 200) {

@@ -30,7 +30,7 @@
           <n-text class="name">
             {{
               userLikeData.playlists?.[0]?.id === playlistId
-                ? "我喜欢的音乐"
+                ? "我的最爱"
                 : playListDetail.name || "未知歌单"
             }}
           </n-text>
@@ -249,7 +249,6 @@ import {
 } from "@/api/playlist";
 import { getSongDetail } from "@/api/song";
 import { formatNumber, fuzzySearch } from "@/utils/helper";
-import { isLogin } from "@/utils/auth";
 import { getTimestampTime } from "@/utils/timeTools";
 import { playAllSongs } from "@/utils/Player";
 import debounce from "@/utils/debounce";
@@ -264,15 +263,16 @@ const { userLikeData, userData } = storeToRefs(data);
 const LOCAL_LIKE_PLAYLIST_ID = "local-like-songs";
 const getCurrentPlaylistId = (route) => {
   if (route.name === "like-songs") {
-    return isLogin() ? userLikeData.value.playlists?.[0]?.id || null : LOCAL_LIKE_PLAYLIST_ID;
+    return userLikeData.value.playlists?.[0]?.id || LOCAL_LIKE_PLAYLIST_ID;
   }
   return route.query?.id;
 };
 const playlistId = ref(getCurrentPlaylistId(router.currentRoute.value));
 
-const isLocalLikeSongs = computed(
-  () => router.currentRoute.value.name === "like-songs" && !isLogin(),
-);
+const isLocalLikeSongs = computed(() => {
+  if (router.currentRoute.value.name !== "like-songs") return false;
+  return !userLikeData.value.playlists?.[0]?.id;
+});
 
 // 子组件
 const playlistUpdateRef = ref(null);
@@ -345,7 +345,7 @@ const getPlayListDetailData = async (id, justDetail = false) => {
       const localCover = "/images/pic/like.jpg?assest";
       const likeIds = userLikeData.value.songs || [];
       playListDetail.value = {
-        name: "我喜欢的音乐",
+        name: "我的最爱",
         cover: localCover,
         coverSize: { l: localCover, m: localCover, s: localCover },
         creator: { nickname: "本地收藏" },
@@ -353,7 +353,7 @@ const getPlayListDetailData = async (id, justDetail = false) => {
         playCount: 0,
         createTime: null,
         updateTime: null,
-        description: "未登录状态下的本地喜欢列表",
+        description: "我最爱听的歌曲列表",
       };
       isUserPLayList.value = true;
       moreOptions.value = [];
@@ -381,13 +381,9 @@ const getPlayListDetailData = async (id, justDetail = false) => {
     }
     // 是否为用户歌单
     isUserPLayList.value = detail.playlist.userId === userData.value?.userId;
-    // 判断登录并获取歌曲
+    // 判断来源并获取歌曲
     let songsDetail = null;
-    if (isLogin() && isUserPLayList.value) {
-      if (!detail.privileges) {
-        playListData.value = "empty";
-        return false;
-      }
+    if (isUserPLayList.value && detail.privileges) {
       const ids = detail.privileges.map((song) => song.id).join(",");
       songsDetail = await getSongDetail(ids);
     } else {
@@ -491,7 +487,6 @@ const isLikeOrDislike = (id) => {
 // 收藏 / 取消收藏歌单
 const likeOrDislike = debounce(async (id) => {
   try {
-    if (!isLogin()) return $message.warning("请登录后使用");
     const type = isLikeOrDislike(id) ? 1 : 2;
     const result = await likePlaylist(type, id);
     if (result.code === 200) {

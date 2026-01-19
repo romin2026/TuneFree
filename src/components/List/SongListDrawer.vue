@@ -125,7 +125,7 @@
           <n-text class="name"> 观看 MV </n-text>
         </div>
         <div
-          v-if="!isCloud && isUserPlaylist"
+          v-if="isUserPlaylist"
           class="menu-item"
           @click="
             () => {
@@ -138,36 +138,6 @@
             <SvgIcon icon="delete" />
           </n-icon>
           <n-text class="name"> 从歌单中删除 </n-text>
-        </div>
-        <div
-          v-if="isCloud"
-          class="menu-item"
-          @click="
-            () => {
-              drawerShow = false;
-              emit('delCloudSong', playlistData, songData, songIndex);
-            }
-          "
-        >
-          <n-icon size="22">
-            <SvgIcon icon="delete" />
-          </n-icon>
-          <n-text class="name"> 从云盘中删除 </n-text>
-        </div>
-        <div
-          v-if="isCloud"
-          class="menu-item"
-          @click="
-            () => {
-              drawerShow = false;
-              cloudSongMatchRef?.openCloudSongMatch(songData, songIndex);
-            }
-          "
-        >
-          <n-icon size="22">
-            <SvgIcon icon="edit" />
-          </n-icon>
-          <n-text class="name"> 云盘歌曲纠正 </n-text>
         </div>
         <div
           v-if="isSong && !isLocalSong"
@@ -191,8 +161,6 @@
   <AddPlaylist ref="addPlaylistRef" />
   <!-- 下载歌曲 -->
   <DownloadSong ref="downloadSongRef" />
-  <!-- 云盘歌曲纠正 -->
-  <CloudSongMatch ref="cloudSongMatchRef" />
 </template>
 
 <script setup>
@@ -207,12 +175,11 @@ const music = musicData();
 const status = siteStatus();
 const { playMode } = storeToRefs(status);
 const { userData, userLikeData } = storeToRefs(data);
-const emit = defineEmits(["playSong", "delCloudSong", "deletePlaylistSong", "delLocalSong"]);
+const emit = defineEmits(["playSong", "deletePlaylistSong", "delLocalSong"]);
 
 // 子组件
 const addPlaylistRef = ref(null);
 const downloadSongRef = ref(null);
-const cloudSongMatchRef = ref(null);
 
 // 菜单数据
 const drawerShow = ref(false);
@@ -227,7 +194,6 @@ const isFm = computed(() => playMode.value === "fm");
 const isSong = computed(() => songType.value === "song");
 const isLocalSong = computed(() => !!songData.value?.path);
 const isHasMv = computed(() => !!songData.value?.mv && songData.value.mv !== 0);
-const isCloud = computed(() => router.currentRoute.value.name === "cloud");
 const isUserPlaylist = computed(() => {
   // 用户 id
   const userId = userData.value?.userId;

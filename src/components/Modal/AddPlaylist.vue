@@ -66,7 +66,6 @@
 import { storeToRefs } from "pinia";
 import { siteData } from "@/stores";
 import { addSongToPlayList } from "@/api/playlist";
-import { isLogin } from "@/utils/auth";
 
 const data = siteData();
 const { userLikeData, userData } = storeToRefs(data);
@@ -93,7 +92,6 @@ const addToPlayList = async (pid, tracks, index) => {
 
 // 开启收藏到歌单
 const openAddToPlaylist = async (id) => {
-  if (!isLogin()) return $message.warning("请登录后使用");
   addToPlaylistId.value = id;
   addToPlaylistShow.value = true;
   await data.setUserLikePlaylists();

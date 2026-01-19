@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddPlaylist: typeof import('./src/components/Modal/AddPlaylist.vue')['default']
-    CloudSongMatch: typeof import('./src/components/Modal/CloudSongMatch.vue')['default']
     CommentList: typeof import('./src/components/List/CommentList.vue')['default']
     CountDown: typeof import('./src/components/Player/CountDown.vue')['default']
     CoverDropdown: typeof import('./src/components/Cover/CoverDropdown.vue')['default']
@@ -103,7 +102,6 @@ declare module 'vue' {
     Spectrum: typeof import('./src/components/Player/Spectrum.vue')['default']
     SvgIcon: typeof import('./src/components/Global/SvgIcon.vue')['default']
     TitleBar: typeof import('./src/components/WinDom/TitleBar.vue')['default']
-    UpCloudSong: typeof import('./src/components/Modal/UpCloudSong.vue')['default']
     UserData: typeof import('./src/components/Nav/UserData.vue')['default']
   }
 }

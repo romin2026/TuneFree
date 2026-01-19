@@ -99,7 +99,6 @@ const routes = [
     name: "daily-songs",
     meta: {
       title: "每日推荐",
-      needLogin: true,
     },
     component: () => import("@/views/DailySongs.vue"),
   },
@@ -129,16 +128,6 @@ const routes = [
       title: "最近播放",
     },
     component: () => import("@/views/History.vue"),
-  },
-  // 我的云盘
-  {
-    path: "/cloud",
-    name: "cloud",
-    meta: {
-      title: "我的云盘",
-      keepAlive: true,
-    },
-    component: () => import("@/views/Cloud.vue"),
   },
   // 歌单
   {
