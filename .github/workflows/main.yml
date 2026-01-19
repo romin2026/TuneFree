@@ -119,14 +119,20 @@ jobs:
       - name: clean dist
         if: needs.Build.outputs.x86 == 1
         run: rm dist -Recurse -Force
+
       - name: pack x86_64
+        if: needs.Build.outputs.x86_64 == 1
         run: pnpm exec electron-builder --win --x64 --config --publish never
+
       - name: reg windows x64 packs
         if: needs.Build.outputs.x86_64 == 1
-        run: $NAME=Get-Childitem -Path dist -Include *.exe -Name -File ;
-             $EXE="dist/${NAME}" ;
-             echo EXE=$EXE >> $env:GITHUB_ENV ;
-             echo NAME=$NAME >> $env:GITHUB_ENV
+        shell: pwsh
+        run: |
+          $NAME = Get-ChildItem -Path dist -Filter *.exe -File | Select-Object -ExpandProperty Name
+          $EXE = "dist/$NAME"
+          "EXE=$EXE" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "NAME=$NAME" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Upload EXE RELEASE
         if: needs.Build.outputs.x86_64 == 1
         uses: actions/upload-artifact@v4
