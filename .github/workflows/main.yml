@@ -85,15 +85,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: setup environment
-        run: npm install pnpm electron-builder -g
-      - name: install libs
-        run: pnpm install
+        - name: setup environment
+        run: npm install -g pnpm
+
+
+
+        - name: install libs
+        run: pnpm install --frozen-lockfile
       - name: postinstall
         run: pnpm postinstall
       - name: build 
         run: npm run build
-
       - name: pack x86
         if: needs.Build.outputs.x86 == 1
         run: electron-builder --win --ia32 --config --publish never
@@ -120,10 +122,8 @@ jobs:
       - name: clean dist
         if: needs.Build.outputs.x86 == 1
         run: rm dist -Recurse -Force
-
-      - name: pack x86_64
-        if: needs.Build.outputs.x86_64 == 1
-        run: electron-builder --win --x64 --config --publish never
+        - name: pack x86_64
+        run: pnpm exec electron-builder --win --x64 --config --publish never
       - name: reg windows x64 packs
         if: needs.Build.outputs.x86_64 == 1
         run: $NAME=Get-Childitem -Path dist -Include *.exe -Name -File ;
