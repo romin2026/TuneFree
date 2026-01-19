@@ -30,9 +30,9 @@ import { useRouter } from "vue-router";
 import { getAllPlayList } from "@/api/playlist";
 import { getAlbumDetail } from "@/api/album";
 import { getDjProgram } from "@/api/dj";
+import { getSongDetail } from "@/api/song";
 import { musicData, siteStatus, siteData } from "@/stores";
 import { playOrPause, initPlayer } from "@/utils/Player";
-import { isLogin } from "@/utils/auth";
 import formatData from "@/utils/formatData";
 
 const router = useRouter();
@@ -75,11 +75,16 @@ const getPlaylistData = async () => {
   switch (props.type) {
     case "playlist": {
       if (props.id === 1024) {
-        console.log("播放我喜欢的音乐");
+        console.log("播放我的最爱");
         const id = userLikeData.value.playlists?.[0]?.id || null;
-        if (!isLogin() || !id) return 400;
-        const result = await getAllPlayList(id, 500);
-        return formatData(result.songs, "song");
+        if (id) {
+          const result = await getAllPlayList(id, 500);
+          return formatData(result.songs, "song");
+        }
+        const likeIds = userLikeData.value.songs || [];
+        if (!likeIds.length) return [];
+        const songsDetail = await getSongDetail(likeIds.join(","));
+        return formatData(songsDetail.songs, "song");
       } else {
         const result = await getAllPlayList(props.id, 500);
         return formatData(result.songs, "song");
@@ -114,9 +119,9 @@ const playAllSongs = async () => {
           playLoading.value = false;
           return $message.error("获取播放列表时出现错误");
         }
-        if (playListData.value === 400) {
+        if (Array.isArray(playListData.value) && playListData.value.length === 0) {
           playLoading.value = false;
-          return $message.error("请登录后使用");
+          return $message.warning("我的最爱暂无歌曲");
         }
         console.log("不在歌单内");
         // 更改模式和歌单

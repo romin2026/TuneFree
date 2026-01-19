@@ -217,7 +217,7 @@ export const createPlayer = async (src, autoPlay = true) => {
     const { showSpectrums, memorySeek, useMusicCache } = settings;
     // 当前播放歌曲数据
     const playSongData = music.getPlaySongData;
-    // 获取播放链接（非电台及云盘歌曲）
+    // 获取播放链接（非电台歌曲）
     const songUrl =
       useMusicCache && playMode !== "dj" && !playSongData.pc ? await getBlobUrlFromUrl(src) : src;
     console.log("播放地址：", songUrl);

@@ -128,7 +128,6 @@ import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { getArtistDetail, likeArtist } from "@/api/artist";
 import { siteData } from "@/stores";
-import { isLogin } from "@/utils/auth";
 import formatData from "@/utils/formatData";
 import debounce from "@/utils/debounce";
 
@@ -183,7 +182,6 @@ const isLikeOrDislike = (id) => {
 // 关注 / 取消关注歌手
 const likeOrDislike = debounce(async (id) => {
   try {
-    if (!isLogin()) return $message.warning("请登录后使用");
     const type = isLikeOrDislike(id) ? 1 : 2;
     const result = await likeArtist(type, id);
     if (result.code === 200) {

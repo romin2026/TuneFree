@@ -59,12 +59,13 @@ const handleLyricUpdate = (_, payload) => {
 };
 
 const winDown = (ev) => {
+    if (!hasElectron || isLocked.value) return;
     dragging = true;
     winPos = JSON.parse(electron.ipcRenderer.sendSync("lyric-drag-start"));
 }
 
 const winMove = (ev) => {
-    if (!dragging || isLocked.value) return;
+    if (!hasElectron || !dragging || isLocked.value) return;
     electron.ipcRenderer.send("lyric-drag-moving", JSON.stringify({
         x: ev.screenX - winPos.x,
         y: ev.screenY - winPos.y,
@@ -80,6 +81,7 @@ const lockLyric = () => {
 }
 
 watch(isLocked, (flag) => {
+    if(!hasElectron) return;
     if(flag){
         electron.ipcRenderer.send("lyric-lock");
     }
@@ -89,6 +91,7 @@ watch(isLocked, (flag) => {
 });
 
 watch(isLockHovered, (flag) => {
+    if(!hasElectron) return;
     if(flag){
         electron.ipcRenderer.send("lyric-unlock");
     }

@@ -21,7 +21,7 @@
         </n-avatar>
       </div>
       <div class="user-data">
-        <n-text class="name">访客模式</n-text>
+        <n-text class="name">本地模式</n-text>
         <n-icon depth="3" class="more">
           <SvgIcon icon="menu-down" />
         </n-icon>
@@ -54,7 +54,7 @@ const createUserData = () => {
   return h(
     "div",
     { className: "nav-user-data" },
-    h(NText, { depth: 3 }, () => ["当前为访客模式，未提供账号登录功能"]),
+    h(NText, { depth: 3 }, () => ["当前为本地模式，已启用本地数据功能"]),
   );
 };
 

@@ -49,18 +49,11 @@
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { getGreetings } from "@/utils/timeTools";
-import {
-  getDailyRec,
-  getPersonalized,
-  getRadarPlaylist,
-  getTopArtists,
-  getNewAlbum,
-} from "@/api/recommend";
+import { getPersonalized, getRadarPlaylist, getTopArtists, getNewAlbum } from "@/api/recommend";
 import { allMv } from "@/api/video";
 import { getDjRecommend } from "@/api/dj";
 import { siteData, siteSettings } from "@/stores";
 import { getCacheData } from "@/utils/helper";
-import { isLogin } from "@/utils/auth";
 import formatData from "@/utils/formatData";
 
 const data = siteData();
@@ -75,7 +68,7 @@ const dailySongsCoverData = computed(() => {
     name: "每日推荐",
     desc: "根据你的音乐口味 · 每日更新",
   };
-  if (isLogin() && dailySongsData.value.data?.length) {
+  if (dailySongsData.value.data?.length) {
     const randomIndex = Math.floor(Math.random() * dailySongsData.value.data.length);
     dailySongsCover.cover =
       dailySongsData.value.data[randomIndex]?.coverSize?.s || "/images/pic/like.jpg";
@@ -89,10 +82,10 @@ const dailySongsCoverData = computed(() => {
 const likeSongsCoverData = computed(() => {
   const likeSongsCover = {
     id: 1024,
-    name: "喜欢的音乐",
+    name: "我的最爱",
     desc: "发现你独特的音乐品味",
   };
-  if (isLogin() && userLikeData.value.playlists?.length) {
+  if (userLikeData.value.playlists?.length) {
     likeSongsCover.cover = userLikeData.value.playlists[0]?.coverSize?.s || "/images/pic/like.jpg";
     return likeSongsCover;
   }
@@ -103,7 +96,7 @@ const likeSongsCoverData = computed(() => {
 // 个性化推荐数据
 const recommendData = ref({
   playlist: {
-    name: isLogin() ? "专属歌单" : "推荐歌单",
+    name: "推荐歌单",
     loadingNum: 12,
     columns: showSider.value ? undefined : "2 s:3 m:4 l:5 xl:6",
     data: [],
@@ -152,9 +145,7 @@ const getRecommendData = async () => {
   try {
     const [playlistRes, radarRes, artistRes, mvRes, djRes, albumRes] = await Promise.allSettled([
       // 歌单
-      isLogin()
-        ? getCacheData("recPl-P", 5, getDailyRec, "resource")
-        : getCacheData("recPl", 5, getPersonalized),
+      getCacheData("recPl", 5, getPersonalized),
       // 雷达歌单
       getCacheData("recRadar", 30, getRadarPlaylist),
       // 歌手
@@ -168,13 +159,7 @@ const getRecommendData = async () => {
     ]);
     // 检查请求状态
     playlistRes.status === "fulfilled" &&
-      (recommendData.value.playlist.data = formatData(
-        isLogin()
-          ? playlistRes.value.recommend.filter((playlist) => {
-              return !playlist.name.includes("私人雷达");
-            })
-          : playlistRes.value.result,
-      ));
+      (recommendData.value.playlist.data = formatData(playlistRes.value.result));
     radarRes.status === "fulfilled" &&
       (recommendData.value.radar.data = formatData(radarRes.value));
     artistRes.status === "fulfilled" &&

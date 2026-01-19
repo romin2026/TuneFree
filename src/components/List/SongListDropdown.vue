@@ -17,8 +17,6 @@
   <AddPlaylist ref="addPlaylistRef" />
   <!-- 下载歌曲 -->
   <DownloadSong ref="downloadSongRef" />
-  <!-- 云盘歌曲纠正 -->
-  <CloudSongMatch ref="cloudSongMatchRef" />
 </template>
 
 <script setup>
@@ -30,7 +28,7 @@ import { addSongToNext } from "@/utils/Player";
 import { copyData } from "@/utils/helper";
 import SvgIcon from "@/components/Global/SvgIcon";
 
-const emit = defineEmits(["playSong", "delCloudSong", "deletePlaylistSong", "delLocalSong"]);
+const emit = defineEmits(["playSong", "deletePlaylistSong", "delLocalSong"]);
 const data = siteData();
 const music = musicData();
 const router = useRouter();
@@ -47,7 +45,6 @@ const dropdownOptions = ref(null);
 // 子组件
 const addPlaylistRef = ref(null);
 const downloadSongRef = ref(null);
-const cloudSongMatchRef = ref(null);
 
 // 图标渲染
 const renderIcon = (icon, size, translate = 0) => {
@@ -114,7 +111,6 @@ const openDropdown = (e, data, song, index, sourceId, type) => {
     const isSong = type === "song";
     const isLocalSong = !!song?.path;
     const isHasMv = !!song?.mv && song.mv !== 0;
-    const isCloud = router.currentRoute.value.name === "cloud";
     const isUserPlaylist = sourceId !== 0 && userPlaylistsData.some((pl) => pl.id == sourceId);
     // 生成菜单
     nextTick().then(() => {
@@ -230,39 +226,17 @@ const openDropdown = (e, data, song, index, sourceId, type) => {
         },
 
         {
-          key: "line-cloud",
+          key: "line-playlist",
           type: "divider",
-          show: isCloud || isUserPlaylist || isLocalSong,
+          show: isUserPlaylist || isLocalSong,
         },
         {
           key: "delete",
           label: "从歌单中删除",
-          show: !isCloud && isUserPlaylist,
+          show: isUserPlaylist,
           props: {
             onClick: () => {
               emit("deletePlaylistSong", sourceId, song, data, index);
-            },
-          },
-          icon: renderIcon("delete"),
-        },
-        {
-          key: "edit",
-          label: "云盘歌曲纠正",
-          show: isCloud,
-          props: {
-            onClick: () => {
-              cloudSongMatchRef.value?.openCloudSongMatch(song, index);
-            },
-          },
-          icon: renderIcon("edit"),
-        },
-        {
-          key: "delete",
-          label: "从云盘中删除",
-          show: isCloud,
-          props: {
-            onClick: () => {
-              emit("delCloudSong", data, song, index);
             },
           },
           icon: renderIcon("delete"),

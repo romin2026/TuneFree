@@ -94,21 +94,6 @@
             >
               EP
             </n-tag>
-            <!-- 云盘 -->
-            <n-tag
-              v-if="showPrivilege && item.pc"
-              :bordered="false"
-              class="cloud"
-              type="info"
-              size="small"
-              round
-            >
-              <template #icon>
-                <n-icon>
-                  <SvgIcon icon="cloud" />
-                </n-icon>
-              </template>
-            </n-tag>
             <!-- MV -->
             <n-tag
               v-if="item?.mv"
@@ -213,7 +198,6 @@
       <SongListDropdown
         ref="songListDropdownRef"
         @playSong="playSong"
-        @delCloudSong="delCloudSong"
         @deletePlaylistSong="deletePlaylistSong"
         @delLocalSong="delLocalSong"
       />
@@ -221,7 +205,6 @@
       <SongListDrawer
         ref="songListDrawerRef"
         @playSong="playSong"
-        @delCloudSong="delCloudSong"
         @deletePlaylistSong="deletePlaylistSong"
         @delLocalSong="delLocalSong"
       />
@@ -269,7 +252,6 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
-import { setCloudDel } from "@/api/cloud";
 import { addSongToPlayList } from "@/api/playlist";
 import { siteData, siteSettings, musicData, siteStatus } from "@/stores";
 import { initPlayer, fadePlayOrPause, addSongToNext } from "@/utils/Player";
@@ -417,25 +399,6 @@ const checkCanClick = (data, item, index) => {
   playSong(data, item, index);
 };
 
-// 云盘歌曲删除
-const delCloudSong = (data, song, index) => {
-  console.log(data, song, index);
-  $dialog.warning({
-    title: "确认删除",
-    content: `确认从云盘中删除 ${song.name}？该操作无法撤销！`,
-    positiveText: "删除",
-    negativeText: "取消",
-    onPositiveClick: async () => {
-      const result = await setCloudDel(song.id);
-      if (result.code == 200) {
-        data.splice(index, 1);
-        $message.success("删除成功");
-      } else {
-        $message.error("删除失败，请重试");
-      }
-    },
-  });
-};
 
 // 歌单歌曲删除
 const deletePlaylistSong = (pid, song, data, index) => {
@@ -602,15 +565,6 @@ onBeforeUnmount(() => {
         .n-tag {
           margin-left: 8px;
           height: 18px;
-          &.cloud {
-            padding: 0 10px;
-            align-items: center;
-            justify-content: center;
-            :deep(.n-tag__icon) {
-              margin-right: 0;
-              width: 100%;
-            }
-          }
           &.mv {
             cursor: pointer;
           }
